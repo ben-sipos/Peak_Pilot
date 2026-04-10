@@ -263,6 +263,336 @@ const resorts = [
     event: "Rockies Winter Market",
     stay: "Town hotels, shuttle-linked lodges, spa escapes",
   },
+  {
+    id: "courchevel",
+    name: "Courchevel",
+    country: "France",
+    region: "Les 3 Vallees",
+    skill: "Mixed",
+    vibe: "Luxury alpine",
+    price: "$$$$",
+    match: 92,
+    baseDepth: "165 cm",
+    freshSnow: "22 cm",
+    liftsOpen: "93%",
+    temp: "-6°C",
+    trailCount: 600,
+    lifts: 156,
+    summit: "3,230 m",
+    lat: 45.4154,
+    lon: 6.6345,
+    airport: "Geneva (GVA)",
+    pass: "From EUR 79/day",
+    position: { x: 60, y: 55 },
+    summary:
+      "Prestige villages, huge linked skiing, and polished service make Courchevel one of the Alps' flagship destination resorts.",
+    reasons: ["Massive ski domain", "Luxury stay options", "Strong mixed-group fit"],
+    highlights: [
+      "Direct access to the vast Three Valleys network",
+      "High-end dining, chalets, and concierge-ready stays",
+      "Wide terrain mix for confident skiers and social groups",
+    ],
+    alerts: "Snow bands returning overnight above the mid-mountain line",
+    event: "Summit Gastronomy Week",
+    stay: "Palace hotels, serviced chalets, slope-side residences",
+  },
+  {
+    id: "chamonix",
+    name: "Chamonix",
+    country: "France",
+    region: "Haute-Savoie",
+    skill: "Advanced",
+    vibe: "Legendary alpine",
+    price: "$$$",
+    match: 91,
+    baseDepth: "142 cm",
+    freshSnow: "20 cm",
+    liftsOpen: "81%",
+    temp: "-8°C",
+    trailCount: 150,
+    lifts: 49,
+    summit: "3,842 m",
+    lat: 45.9237,
+    lon: 6.8694,
+    airport: "Geneva (GVA)",
+    pass: "From EUR 73/day",
+    position: { x: 62, y: 53 },
+    summary:
+      "High-mountain character, famous off-piste terrain, and a real alpine town atmosphere make Chamonix a classic.",
+    reasons: ["Iconic terrain", "True alpine town", "Expert appeal"],
+    highlights: [
+      "Legendary access to steep terrain and high-altitude routes",
+      "A large town base with dining, shops, and nightlife",
+      "A destination feel that stays authentic and serious",
+    ],
+    alerts: "Variable visibility on the upper mountain, best skiing lower early",
+    event: "Mont Blanc Mountain Film Nights",
+    stay: "Town hotels, alpine apartments, guide-focused lodges",
+  },
+  {
+    id: "soelden",
+    name: "Solden",
+    country: "Austria",
+    region: "Tyrol",
+    skill: "Mixed",
+    vibe: "High-altitude snow",
+    price: "$$$",
+    match: 90,
+    baseDepth: "176 cm",
+    freshSnow: "24 cm",
+    liftsOpen: "90%",
+    temp: "-7°C",
+    trailCount: 144,
+    lifts: 31,
+    summit: "3,340 m",
+    lat: 46.9698,
+    lon: 11.0076,
+    airport: "Innsbruck (INN)",
+    pass: "From EUR 76/day",
+    position: { x: 59, y: 53 },
+    summary:
+      "Reliable glacier access, long season snow, and a lively Austrian village make Solden a dependable big-trip option.",
+    reasons: ["Altitude security", "Glacier terrain", "Lively village energy"],
+    highlights: [
+      "Strong snow reliability thanks to glacier access",
+      "Wide groomers paired with high-mountain viewpoints",
+      "A social village with easy transfer logistics",
+    ],
+    alerts: "Best snow staying on glacier sectors through the next two mornings",
+    event: "Glacier Sunset Sessions",
+    stay: "Design hotels, apartments, spa-forward stays",
+  },
+  {
+    id: "kitzbuehel",
+    name: "Kitzbuhel",
+    country: "Austria",
+    region: "Tyrol",
+    skill: "Intermediate",
+    vibe: "Classic alpine town",
+    price: "$$$$",
+    match: 89,
+    baseDepth: "132 cm",
+    freshSnow: "14 cm",
+    liftsOpen: "89%",
+    temp: "-4°C",
+    trailCount: "233 km",
+    lifts: 58,
+    summit: "2,000 m",
+    lat: 47.4464,
+    lon: 12.3926,
+    airport: "Salzburg (SZG)",
+    pass: "From EUR 75/day",
+    position: { x: 60, y: 49 },
+    summary:
+      "A charming medieval town, efficient ski network, and polished Austrian hospitality keep Kitzbuhel in heavy rotation.",
+    reasons: ["Town atmosphere", "Polished logistics", "Cruising terrain"],
+    highlights: [
+      "A destination town with real character and walkable streets",
+      "Broad piste network with strong intermediate appeal",
+      "Prestige events and premium guest experience",
+    ],
+    alerts: "Firm early corduroy with softer lower slopes by lunch",
+    event: "Hahnenkamm Festival Week",
+    stay: "Historic hotels, boutique stays, stylish apartments",
+  },
+  {
+    id: "vail",
+    name: "Vail",
+    country: "USA",
+    region: "Colorado",
+    skill: "Mixed",
+    vibe: "Big-mountain luxury",
+    price: "$$$$",
+    match: 88,
+    baseDepth: "181 cm",
+    freshSnow: "17 cm",
+    liftsOpen: "94%",
+    temp: "-10°C",
+    trailCount: 278,
+    lifts: 31,
+    summit: "3,527 m",
+    lat: 39.6061,
+    lon: -106.355,
+    airport: "Denver (DEN)",
+    pass: "Epic Pass or USD 259/day",
+    position: { x: 20, y: 42 },
+    summary:
+      "Back bowls, strong village infrastructure, and upscale Rocky Mountain planning make Vail a major flagship resort.",
+    reasons: ["Back bowl terrain", "Luxury village", "Strong family and group fit"],
+    highlights: [
+      "Large scale and iconic open bowl skiing",
+      "Well-developed lodging, dining, and transfer ecosystem",
+      "A dependable choice for polished destination trips",
+    ],
+    alerts: "Cooler overnight temperatures improving snow quality for the bowls",
+    event: "Vail Snow Nights",
+    stay: "Village hotels, residences, premium condos",
+  },
+  {
+    id: "park-city",
+    name: "Park City",
+    country: "USA",
+    region: "Utah",
+    skill: "Mixed",
+    vibe: "Easy-access giant",
+    price: "$$$",
+    match: 87,
+    baseDepth: "154 cm",
+    freshSnow: "16 cm",
+    liftsOpen: "92%",
+    temp: "-8°C",
+    trailCount: 330,
+    lifts: 41,
+    summit: "3,049 m",
+    lat: 40.6514,
+    lon: -111.5078,
+    airport: "Salt Lake City (SLC)",
+    pass: "Epic Pass or USD 269/day",
+    position: { x: 23, y: 43 },
+    summary:
+      "Huge skiable acreage, one of the easiest airport transfers in North America, and a lively main street base.",
+    reasons: ["Fast transfer", "Huge ski footprint", "Good mixed-group value"],
+    highlights: [
+      "Short transfer time from a major international airport",
+      "Big terrain spread suited to long ski weeks",
+      "A resort town with nightlife, events, and dining variety",
+    ],
+    alerts: "Sunny start before cloud thickens into tomorrow afternoon",
+    event: "Main Street Winter Series",
+    stay: "Historic inns, condos, mountain hotels",
+  },
+  {
+    id: "aspen-snowmass",
+    name: "Aspen Snowmass",
+    country: "USA",
+    region: "Colorado",
+    skill: "Mixed",
+    vibe: "Premium multi-mountain",
+    price: "$$$$",
+    match: 90,
+    baseDepth: "170 cm",
+    freshSnow: "18 cm",
+    liftsOpen: "90%",
+    temp: "-9°C",
+    trailCount: 336,
+    lifts: 42,
+    summit: "3,813 m",
+    lat: 39.1911,
+    lon: -106.8175,
+    airport: "Aspen (ASE)",
+    pass: "From USD 244/day",
+    position: { x: 19, y: 43 },
+    summary:
+      "Four distinct mountains, upscale service, and a famous social scene make Aspen Snowmass a complete destination play.",
+    reasons: ["Multi-mountain variety", "Premium service", "Strong dining and culture"],
+    highlights: [
+      "Different mountain personalities within one destination",
+      "Strong terrain spread from cruisers to advanced lines",
+      "High-end food, events, and polished lodging",
+    ],
+    alerts: "Dry cold pattern preserving chalky snow on upper faces",
+    event: "Aspen Alpine Art Weekend",
+    stay: "Luxury hotels, designer condos, family residences",
+  },
+  {
+    id: "tignes",
+    name: "Tignes",
+    country: "France",
+    region: "Savoie",
+    skill: "Advanced",
+    vibe: "Snow-sure altitude",
+    price: "$$$",
+    match: 89,
+    baseDepth: "188 cm",
+    freshSnow: "26 cm",
+    liftsOpen: "93%",
+    temp: "-8°C",
+    trailCount: 300,
+    lifts: 78,
+    summit: "3,456 m",
+    lat: 45.4693,
+    lon: 6.9059,
+    airport: "Lyon (LYS)",
+    pass: "From EUR 72/day",
+    position: { x: 62, y: 54 },
+    summary:
+      "High-altitude access, dependable conditions, and linked skiing with Val d'Isere make Tignes a snow-first favorite.",
+    reasons: ["High altitude", "Long season", "Strong advanced terrain"],
+    highlights: [
+      "One of the Alps' more reliable snow bets",
+      "Fast lift network with glacier access",
+      "Popular for groups that prioritize skiing over formality",
+    ],
+    alerts: "Fresh wind-drifted snow likely on high ridgelines after tonight",
+    event: "Glacier Light Festival",
+    stay: "Slope-side apartments, sport hotels, group lodges",
+  },
+  {
+    id: "la-plagne",
+    name: "La Plagne",
+    country: "France",
+    region: "Savoie",
+    skill: "Family",
+    vibe: "Big terrain value",
+    price: "$$",
+    match: 86,
+    baseDepth: "149 cm",
+    freshSnow: "18 cm",
+    liftsOpen: "90%",
+    temp: "-5°C",
+    trailCount: 225,
+    lifts: 74,
+    summit: "3,250 m",
+    lat: 45.5067,
+    lon: 6.6779,
+    airport: "Lyon (LYS)",
+    pass: "From EUR 67/day",
+    position: { x: 61, y: 54 },
+    summary:
+      "A large practical French ski base with broad terrain, family-friendly logistics, and strong value for longer stays.",
+    reasons: ["Family scale", "Value", "Large linked terrain"],
+    highlights: [
+      "Big terrain with easier planning than prestige resorts nearby",
+      "Strong apartment stock for week-long stays",
+      "Useful mixed-ability flow across linked sectors",
+    ],
+    alerts: "Snowpack holding well on north-facing runs through midweek",
+    event: "Paradiski Family Glow Run",
+    stay: "Residences, self-catered apartments, family hotels",
+  },
+  {
+    id: "cortina",
+    name: "Cortina d'Ampezzo",
+    country: "Italy",
+    region: "Dolomites",
+    skill: "Intermediate",
+    vibe: "Stylish Dolomites",
+    price: "$$$$",
+    match: 88,
+    baseDepth: "121 cm",
+    freshSnow: "12 cm",
+    liftsOpen: "88%",
+    temp: "-3°C",
+    trailCount: 120,
+    lifts: 35,
+    summit: "2,939 m",
+    lat: 46.5405,
+    lon: 12.1357,
+    airport: "Venice (VCE)",
+    pass: "From EUR 78/day",
+    position: { x: 63, y: 57 },
+    summary:
+      "Elegant town life, dramatic Dolomite scenery, and social appeal give Cortina a distinctive high-style identity.",
+    reasons: ["Dolomite scenery", "Stylish town", "Intermediate appeal"],
+    highlights: [
+      "A beautiful town base with boutique shopping and dining",
+      "Panoramic skiing and linked Dolomite excursions",
+      "Strong fit for scenic, social destination trips",
+    ],
+    alerts: "Best visibility expected tomorrow morning before higher cloud",
+    event: "Dolomite Style Weekend",
+    stay: "Boutique hotels, design apartments, luxury chalets",
+  },
 ];
 
 const events = [
@@ -330,10 +660,12 @@ const COUNTRY_CODES = {
   Italy: "IT",
   Japan: "JP",
   Switzerland: "CH",
+  USA: "US",
 };
 const apiState = {
   config: null,
   weatherByResort: {},
+  weatherStatusByResort: {},
   skiGeoByResort: {},
   locationByResort: {},
   nearbyByResort: {},
@@ -341,6 +673,8 @@ const apiState = {
   pending: new Set(),
 };
 let discoverMap = null;
+let resortDetailMap = null;
+let scheduledRender = null;
 
 function loadState() {
   const saved = safeParse(localStorage.getItem("peakpilot-state"));
@@ -391,6 +725,14 @@ function safeParse(value) {
   } catch {
     return null;
   }
+}
+
+function scheduleRender() {
+  if (scheduledRender) return;
+  scheduledRender = window.setTimeout(() => {
+    scheduledRender = null;
+    render();
+  }, 80);
 }
 
 function selectedResort() {
@@ -482,6 +824,10 @@ function formatAreaLabel(resort) {
 
 function featuredEventFor(resort) {
   return eventsFor(resort)[0] || null;
+}
+
+function weatherStatusFor(resort) {
+  return apiState.weatherStatusByResort[resort.id] || "idle";
 }
 
 function weatherLabelFromCode(code) {
@@ -617,6 +963,123 @@ function renderForecastGrid(resort) {
   `;
 }
 
+const TRAIL_MAPS = {
+  "zermatt": "https://skimap.org/data/1004/7/1218552399.jpg",
+  "saint-anton": "https://skimap.org/data/111/4/1199388863.jpg",
+  "val-gardena": "https://skimap.org/data/278/1/1572528775.jpg",
+  "whistler": "https://skimap.org/data/285/1/1511280365.jpg",
+  "niseko": "https://skimap.org/data/3261/1/1393699317.jpg",
+  "verbier": "https://skimap.org/data/1039/1/1199383617.jpg",
+  "les-arcs": "https://skimap.org/data/981/1/1344408139.jpg",
+  "banff": "https://skimap.org/data/289/1/1414434283.jpg",
+  "courchevel": "https://skimap.org/data/953/1/1547466542.jpg",
+  "chamonix": "https://skimap.org/data/969/1/1216342600.jpg",
+  "soelden": "https://skimap.org/data/127/1/1541212850.jpg",
+  "kitzbuehel": "https://skimap.org/data/104/1/1541258671.jpg",
+  "vail": "https://skimap.org/data/239/1/1542127202.jpg",
+  "park-city": "https://skimap.org/data/255/1/1446726207.jpg",
+  "aspen-snowmass": "https://skimap.org/data/230/1/1448206979.jpg",
+  "tignes": "https://skimap.org/data/985/1/1539268670.jpg",
+  "la-plagne": "https://skimap.org/data/982/1/1539158372.jpg",
+  "cortina": "https://skimap.org/data/268/1/1569429532.jpg"
+};
+
+function slopeMapImage(resort) {
+  return TRAIL_MAPS[resort.id] || "https://images.unsplash.com/photo-1605540436563-5bca919ae766?auto=format&fit=crop&q=80&w=1000";
+}
+
+function polylinePoints(values, width, height, padding) {
+  const valid = values.filter((value) => value != null);
+  if (!valid.length) return "";
+  const min = Math.min(...valid);
+  const max = Math.max(...valid);
+  const span = max - min || 1;
+  return values
+    .map((value, index) => {
+      const x = padding + (index * (width - padding * 2)) / Math.max(values.length - 1, 1);
+      const normalized = value == null ? min : value;
+      const y = height - padding - ((normalized - min) / span) * (height - padding * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+}
+
+function renderWeatherTrendCharts(resort) {
+  const weather = weatherFor(resort);
+  if (!weather?.daily?.length) {
+    return `
+      <div class="chart-grid">
+        <article class="chart-card">
+          <span class="mini-badge badge-blue">Weather trends</span>
+          <p>Live charts are loading for ${resort.name}.</p>
+        </article>
+      </div>
+    `;
+  }
+
+  const hourly = weather.hourly?.slice(0, 8) || [];
+  const daily = weather.daily.slice(0, 5);
+  const width = 420;
+  const height = 220;
+  const padding = 26;
+  const hourlyTemps = hourly.map((item) => item.temperatureC);
+  const dailySnow = daily.map((item) => item.snowfallCm ?? 0);
+  const dailyWind = daily.map((item) => item.windSpeedMaxKmh ?? 0);
+  const tempLine = polylinePoints(hourlyTemps, width, height, padding);
+  const windLine = polylinePoints(dailyWind, width, height, padding);
+  const maxSnow = Math.max(...dailySnow, 1);
+
+  return `
+    <div class="chart-grid">
+      <article class="chart-card">
+        <span class="mini-badge badge-blue">Next 8 hours</span>
+        <h3>Temperature trend</h3>
+        <svg viewBox="0 0 ${width} ${height}" class="chart-svg" aria-label="Hourly temperature trend">
+          <path d="M ${padding} ${height - padding} H ${width - padding}" class="chart-axis"/>
+          <path d="M ${padding} ${padding} V ${height - padding}" class="chart-axis"/>
+          <polyline points="${tempLine}" class="chart-line chart-line-temp"/>
+          ${hourlyTemps
+            .map((value, index) => {
+              const x = padding + (index * (width - padding * 2)) / Math.max(hourlyTemps.length - 1, 1);
+              const valid = hourlyTemps.filter((item) => item != null);
+              const min = Math.min(...valid);
+              const max = Math.max(...valid);
+              const span = max - min || 1;
+              const y = height - padding - (((value ?? min) - min) / span) * (height - padding * 2);
+              return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="chart-dot"/>`;
+            })
+            .join("")}
+        </svg>
+        <div class="chart-label-row">
+          ${hourly
+            .map((item) => `<span>${new Date(item.time).toLocaleTimeString("en-US", { hour: "numeric" })}</span>`)
+            .join("")}
+        </div>
+      </article>
+      <article class="chart-card">
+        <span class="mini-badge badge-lime">Next 5 days</span>
+        <h3>Snowfall and wind outlook</h3>
+        <svg viewBox="0 0 ${width} ${height}" class="chart-svg" aria-label="Snowfall and wind outlook">
+          <path d="M ${padding} ${height - padding} H ${width - padding}" class="chart-axis"/>
+          ${dailySnow
+            .map((value, index) => {
+              const x = padding + 18 + index * ((width - padding * 2) / Math.max(dailySnow.length, 1));
+              const barWidth = 34;
+              const barHeight = (value / maxSnow) * (height - padding * 2 - 24);
+              const y = height - padding - barHeight;
+              return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth}" height="${barHeight.toFixed(1)}" rx="10" class="chart-bar"/>`;
+            })
+            .join("")}
+          <polyline points="${windLine}" class="chart-line chart-line-wind"/>
+        </svg>
+        <div class="chart-label-row">
+          ${daily.map((day) => `<span>${shortDayLabel(day.date)}</span>`).join("")}
+        </div>
+      </article>
+    </div>
+  `;
+}
+
 function integrationSummary() {
   if (!canUseApi()) {
     return "API adapters are available when you run the local server.";
@@ -654,29 +1117,41 @@ function ensureConfigLoaded() {
   fetchJson("/api/config")
     .then((data) => {
       apiState.config = data;
-      render();
+      scheduleRender();
     })
     .catch(() => {
       apiState.config = { integrations: {} };
-      render();
+      scheduleRender();
     })
     .finally(() => apiState.pending.delete("config"));
 }
 
-function ensureResortApiData(resort) {
+function ensureWeatherForResort(resort) {
   if (!canUseApi() || !resort?.lat || !resort?.lon) return;
-
   const weatherKey = `weather:${resort.id}`;
   if (!apiState.weatherByResort[resort.id] && !apiState.pending.has(weatherKey)) {
     apiState.pending.add(weatherKey);
+    apiState.weatherStatusByResort[resort.id] = "loading";
     fetchJson(`/api/weather?lat=${encodeURIComponent(resort.lat)}&lon=${encodeURIComponent(resort.lon)}`)
       .then((data) => {
         apiState.weatherByResort[resort.id] = data;
-        render();
+        apiState.weatherStatusByResort[resort.id] = "ready";
+        scheduleRender();
       })
-      .catch(() => {})
+      .catch(() => {
+        apiState.weatherStatusByResort[resort.id] = "error";
+        window.setTimeout(() => {
+          if (!apiState.weatherByResort[resort.id]) ensureWeatherForResort(resort);
+        }, 2200);
+        scheduleRender();
+      })
       .finally(() => apiState.pending.delete(weatherKey));
   }
+}
+
+function ensureResortApiData(resort) {
+  if (!canUseApi() || !resort?.lat || !resort?.lon) return;
+  ensureWeatherForResort(resort);
 
   const geoKey = `geo:${resort.id}`;
   if (!apiState.skiGeoByResort[resort.id] && !apiState.pending.has(geoKey)) {
@@ -686,7 +1161,7 @@ function ensureResortApiData(resort) {
     )
       .then((data) => {
         apiState.skiGeoByResort[resort.id] = data;
-        render();
+        scheduleRender();
       })
       .catch(() => {})
       .finally(() => apiState.pending.delete(geoKey));
@@ -698,7 +1173,7 @@ function ensureResortApiData(resort) {
     fetchJson(`/api/location?lat=${encodeURIComponent(resort.lat)}&lon=${encodeURIComponent(resort.lon)}`)
       .then((data) => {
         apiState.locationByResort[resort.id] = data;
-        render();
+        scheduleRender();
       })
       .catch(() => {})
       .finally(() => apiState.pending.delete(locationKey));
@@ -710,7 +1185,7 @@ function ensureResortApiData(resort) {
     fetchJson(`/api/nearby?lat=${encodeURIComponent(resort.lat)}&lon=${encodeURIComponent(resort.lon)}`)
       .then((data) => {
         apiState.nearbyByResort[resort.id] = data;
-        render();
+        scheduleRender();
       })
       .catch(() => {})
       .finally(() => apiState.pending.delete(nearbyKey));
@@ -728,7 +1203,7 @@ function ensureResortApiData(resort) {
     )
       .then((data) => {
         apiState.eventsByResort[resort.id] = data.items || [];
-        render();
+        scheduleRender();
       })
       .catch(() => {})
       .finally(() => apiState.pending.delete(eventsKey));
@@ -738,9 +1213,22 @@ function ensureResortApiData(resort) {
 function hydrateVisibleData() {
   ensureConfigLoaded();
   const leadResort = state.view === "discover" ? discoverFocusResort() : selectedResort();
-  const activeResorts = new Set([leadResort.id, ...filteredResorts().slice(0, 4).map((resort) => resort.id)]);
+  const weatherTargets =
+    state.view === "discover"
+      ? filteredResorts()
+      : state.view === "snow"
+        ? resorts
+        : [leadResort, ...resorts.filter((resort) => state.compareResorts.has(resort.id) || state.savedResorts.has(resort.id)).slice(0, 4)];
+
+  weatherTargets.forEach((resort) => ensureWeatherForResort(resort));
+
+  const richTargets =
+    state.view === "discover"
+      ? [leadResort, ...filteredResorts().slice(0, 8)]
+      : [leadResort];
+
   resorts
-    .filter((resort) => activeResorts.has(resort.id))
+    .filter((resort) => richTargets.some((item) => item.id === resort.id))
     .forEach((resort) => ensureResortApiData(resort));
 }
 
@@ -748,6 +1236,12 @@ function destroyDiscoverMap() {
   if (!discoverMap) return;
   discoverMap.remove();
   discoverMap = null;
+}
+
+function destroyResortDetailMap() {
+  if (!resortDetailMap) return;
+  resortDetailMap.remove();
+  resortDetailMap = null;
 }
 
 function mountDiscoverMap() {
@@ -813,6 +1307,52 @@ function mountDiscoverMap() {
   window.setTimeout(() => discoverMap && discoverMap.invalidateSize(), 0);
 }
 
+function mountResortDetailMap() {
+  if (state.view !== "resort") {
+    destroyResortDetailMap();
+    return;
+  }
+
+  const mapNode = document.getElementById("resort-detail-map");
+  if (!mapNode || !window.L) return;
+
+  destroyResortDetailMap();
+
+  const resort = selectedResort();
+  resortDetailMap = window.L.map(mapNode, {
+    zoomControl: false,
+    dragging: true,
+    scrollWheelZoom: false,
+  });
+
+  window.L.control.zoom({ position: "bottomright" }).addTo(resortDetailMap);
+  window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  }).addTo(resortDetailMap);
+
+  window.L.marker([resort.lat, resort.lon], {
+    icon: window.L.divIcon({
+      className: "resort-marker-wrap",
+      html: `<span class="resort-marker is-active"></span>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    }),
+    title: resort.name,
+  }).addTo(resortDetailMap);
+
+  window.L.circle([resort.lat, resort.lon], {
+    radius: 4200,
+    color: "#2e66ff",
+    weight: 2,
+    fillColor: "#7ee3f2",
+    fillOpacity: 0.12,
+  }).addTo(resortDetailMap);
+
+  resortDetailMap.setView([resort.lat, resort.lon], 12);
+  window.setTimeout(() => resortDetailMap && resortDetailMap.invalidateSize(), 0);
+}
+
 function navButton(view, label) {
   return `<button class="nav-link ${state.view === view ? "is-active" : ""}" data-action="navigate" data-view="${view}">${label}</button>`;
 }
@@ -830,14 +1370,14 @@ function quickEntry(title, copy, badgeClass, view) {
 function render() {
   persist();
   destroyDiscoverMap();
+  destroyResortDetailMap();
   app.innerHTML = `
     <div class="topbar-wrap">
       <header class="topbar">
         <button class="brand" data-action="navigate" data-view="home" aria-label="Go to homepage">
           <span class="brand-mark">✦</span>
           <span class="brand-copy">
-            <strong>PeakPilot Alpine</strong>
-            <span>AI clarity + alpine depth</span>
+            <strong>PeakPilot Alpine Intelligence</strong>
           </span>
         </button>
         <nav class="nav-links" aria-label="Primary navigation">
@@ -862,6 +1402,7 @@ function render() {
   `;
   hydrateVisibleData();
   mountDiscoverMap();
+  mountResortDetailMap();
 }
 
 function renderView() {
@@ -1227,6 +1768,7 @@ function renderDiscover() {
 
 function renderResort() {
   const resort = selectedResort();
+  const weatherStatus = weatherStatusFor(resort);
   return `
     <section class="section-head">
       <div>
@@ -1267,7 +1809,24 @@ function renderResort() {
           </div>
         </article>
         <article class="panel">
+          <span class="mini-badge badge-lime">Resort map</span>
+          <div class="resort-media-grid" style="margin-top: 14px;">
+            <div class="resort-map-panel">
+              <div id="resort-detail-map" class="resort-detail-map" aria-label="Zoomed map of ${escapeAttr(resort.name)}"></div>
+            </div>
+            <figure class="slope-map-panel">
+              <img class="slope-map-image" src="${slopeMapImage(resort)}" alt="${escapeAttr(resort.name)} slope map preview" />
+              <figcaption class="muted">Slope map preview for ${resort.name}</figcaption>
+            </figure>
+          </div>
+        </article>
+        <article class="panel">
           <span class="mini-badge badge-blue">Live weather and forecast</span>
+          ${
+            weatherStatus === "error"
+              ? `<div class="panel-note" style="margin-top: 14px;"><strong>Weather retrying</strong><span>The live weather feed missed once and is retrying automatically.</span></div>`
+              : ""
+          }
           <div class="detail-grid" style="margin-top: 14px;">
             <div class="metric"><small>Current sky</small><strong>${formatCurrentWeatherLabel(resort)}</strong></div>
             <div class="metric"><small>Current temp</small><strong>${currentTempLabel(resort)}</strong></div>
@@ -1278,6 +1837,9 @@ function renderResort() {
           </div>
           <div style="margin-top: 16px;">
             ${renderForecastGrid(resort)}
+          </div>
+          <div style="margin-top: 18px;">
+            ${renderWeatherTrendCharts(resort)}
           </div>
         </article>
         <article class="panel">
@@ -1622,7 +2184,7 @@ function renderFooter() {
           <div class="brand">
             <span class="brand-mark">✦</span>
             <span class="brand-copy">
-              <strong style="color: white;">PeakPilot Alpine</strong>
+              <strong style="color: white;">PeakPilot Alpine Intelligence</strong>
               <span style="color: rgba(255,255,255,0.64);">Modern resort discovery with serious trip utility</span>
             </span>
           </div>

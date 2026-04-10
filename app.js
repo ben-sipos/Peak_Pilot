@@ -653,6 +653,13 @@ const plannerTemplate = [
 const state = loadState();
 const app = document.getElementById("app");
 const API_BASE = window.location.protocol.startsWith("http") ? window.location.origin : "";
+const APP_BASE_PATH = (() => {
+  const pathname = window.location.pathname || "/";
+  if (pathname.endsWith("/")) return pathname;
+  const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
+  if (lastSegment.includes(".")) return pathname.slice(0, pathname.lastIndexOf("/") + 1);
+  return `${pathname}/`;
+})();
 const COUNTRY_CODES = {
   Austria: "AT",
   Canada: "CA",
@@ -725,6 +732,10 @@ function safeParse(value) {
   } catch {
     return null;
   }
+}
+
+function assetPath(filename) {
+  return `${APP_BASE_PATH}${filename}`;
 }
 
 function scheduleRender() {
@@ -1397,7 +1408,7 @@ function render() {
     <div class="topbar-wrap">
       <header class="topbar">
         <button class="brand" data-action="navigate" data-view="home" aria-label="Go to homepage">
-          <span class="brand-mark"><img src="logo.png" alt="PeakPilot Alpine Intelligence" /></span>
+          <span class="brand-mark"><img src="${assetPath("logo.png")}" alt="PeakPilot Alpine Intelligence" /></span>
           <span class="brand-copy">
             <strong>PeakPilot Alpine Intelligence</strong>
           </span>
@@ -2209,7 +2220,7 @@ function renderFooter() {
       <div class="footer-grid">
         <div>
           <div class="brand">
-            <span class="brand-mark"><img src="logo.png" alt="PeakPilot Alpine Intelligence" /></span>
+            <span class="brand-mark"><img src="${assetPath("logo.png")}" alt="PeakPilot Alpine Intelligence" /></span>
             <span class="brand-copy">
               <strong style="color: white;">PeakPilot Alpine Intelligence</strong>
               <span style="color: rgba(255,255,255,0.64);">Modern resort discovery with serious trip utility</span>

@@ -653,13 +653,6 @@ const plannerTemplate = [
 const state = loadState();
 const app = document.getElementById("app");
 const API_BASE = window.location.protocol.startsWith("http") ? window.location.origin : "";
-const APP_BASE_PATH = (() => {
-  const pathname = window.location.pathname || "/";
-  if (pathname.endsWith("/")) return pathname;
-  const lastSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
-  if (lastSegment.includes(".")) return pathname.slice(0, pathname.lastIndexOf("/") + 1);
-  return `${pathname}/`;
-})();
 const COUNTRY_CODES = {
   Austria: "AT",
   Canada: "CA",
@@ -734,8 +727,20 @@ function safeParse(value) {
   }
 }
 
-function assetPath(filename) {
-  return `${APP_BASE_PATH}${filename}`;
+function renderBrandMark() {
+  return `
+    <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="peakpilot-brand-fill" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#91edff" />
+          <stop offset="100%" stop-color="#2e66ff" />
+        </linearGradient>
+      </defs>
+      <rect x="6" y="6" width="52" height="52" rx="16" fill="rgba(255,255,255,0.12)" />
+      <path d="M16 43 L28 22 L34 31 L42 18 L50 43" fill="none" stroke="url(#peakpilot-brand-fill)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="42" cy="18" r="4" fill="#ccf26c" />
+    </svg>
+  `;
 }
 
 function scheduleRender() {
@@ -1408,7 +1413,7 @@ function render() {
     <div class="topbar-wrap">
       <header class="topbar">
         <button class="brand" data-action="navigate" data-view="home" aria-label="Go to homepage">
-          <span class="brand-mark"><img src="${assetPath("logo.jpg")}" alt="PeakPilot Alpine Intelligence" /></span>
+          <span class="brand-mark" aria-hidden="true">${renderBrandMark()}</span>
           <span class="brand-copy">
             <strong>PeakPilot Alpine Intelligence</strong>
           </span>
@@ -2220,10 +2225,9 @@ function renderFooter() {
       <div class="footer-grid">
         <div>
           <div class="brand">
-            <span class="brand-mark"><img src="${assetPath("logo.jpg")}" alt="PeakPilot Alpine Intelligence" /></span>
+            <span class="brand-mark" aria-hidden="true">${renderBrandMark()}</span>
             <span class="brand-copy">
               <strong style="color: white;">PeakPilot Alpine Intelligence</strong>
-              <span style="color: rgba(255,255,255,0.64);">Modern resort discovery with serious trip utility</span>
             </span>
           </div>
           <p>A mountain travel platform for destination discovery, live snow tracking, and connected trip planning.</p>

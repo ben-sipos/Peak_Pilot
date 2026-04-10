@@ -323,12 +323,24 @@ const plannerTemplate = [
 const state = loadState();
 const app = document.getElementById("app");
 const API_BASE = window.location.protocol.startsWith("http") ? window.location.origin : "";
+const COUNTRY_CODES = {
+  Austria: "AT",
+  Canada: "CA",
+  France: "FR",
+  Italy: "IT",
+  Japan: "JP",
+  Switzerland: "CH",
+};
 const apiState = {
   config: null,
   weatherByResort: {},
   skiGeoByResort: {},
+  locationByResort: {},
+  nearbyByResort: {},
+  eventsByResort: {},
   pending: new Set(),
 };
+let discoverMap = null;
 
 function loadState() {
   const saved = safeParse(localStorage.getItem("peakpilot-state"));
@@ -385,6 +397,11 @@ function selectedResort() {
   return resorts.find((resort) => resort.id === state.selectedResortId) || resorts[0];
 }
 
+function discoverFocusResort() {
+  const filtered = filteredResorts();
+  return filtered.find((resort) => resort.id === state.selectedResortId) || filtered[0] || selectedResort();
+}
+
 function filteredResorts() {
   return resorts.filter((resort) => {
     const searchHit =
@@ -416,6 +433,26 @@ function skiGeoFor(resort) {
   return apiState.skiGeoByResort[resort.id] || null;
 }
 
+function locationFor(resort) {
+  return apiState.locationByResort[resort.id] || null;
+}
+
+function nearbyFor(resort) {
+  return apiState.nearbyByResort[resort.id] || null;
+}
+
+function eventsFor(resort) {
+  return apiState.eventsByResort[resort.id] || [];
+}
+
+function serviceEnabled(key) {
+  return Boolean(apiState.config?.integrations?.[key]?.enabled);
+}
+
+function countryCodeFor(resort) {
+  return COUNTRY_CODES[resort.country] || "";
+}
+
 function fallbackTemp(resort) {
   return resort.temp.replace("Â", "");
 }
@@ -437,6 +474,14 @@ function formatFreshSnow(resort) {
   const firstDay = weather?.daily?.[0];
   if (firstDay?.snowfallCm == null) return resort.freshSnow;
   return `${Math.round(firstDay.snowfallCm)} cm`;
+}
+
+function formatAreaLabel(resort) {
+  return locationFor(resort)?.areaLabel || `${resort.region}, ${resort.country}`;
+}
+
+function featuredEventFor(resort) {
+  return eventsFor(resort)[0] || null;
 }
 
 function integrationSummary() {
@@ -513,14 +558,126 @@ function ensureResortApiData(resort) {
       .catch(() => {})
       .finally(() => apiState.pending.delete(geoKey));
   }
+
+  const locationKey = `location:${resort.id}`;
+  if (!apiState.locationByResort[resort.id] && !apiState.pending.has(locationKey)) {
+    apiState.pending.add(locationKey);
+    fetchJson(`/api/location?lat=${encodeURIComponent(resort.lat)}&lon=${encodeURIComponent(resort.lon)}`)
+      .then((data) => {
+        apiState.locationByResort[resort.id] = data;
+        render();
+      })
+      .catch(() => {})
+      .finally(() => apiState.pending.delete(locationKey));
+  }
+
+  const nearbyKey = `nearby:${resort.id}`;
+  if (!apiState.nearbyByResort[resort.id] && !apiState.pending.has(nearbyKey)) {
+    apiState.pending.add(nearbyKey);
+    fetchJson(`/api/nearby?lat=${encodeURIComponent(resort.lat)}&lon=${encodeURIComponent(resort.lon)}`)
+      .then((data) => {
+        apiState.nearbyByResort[resort.id] = data;
+        render();
+      })
+      .catch(() => {})
+      .finally(() => apiState.pending.delete(nearbyKey));
+  }
+
+  const eventsKey = `events:${resort.id}`;
+  if (
+    serviceEnabled("events") &&
+    !apiState.eventsByResort[resort.id] &&
+    !apiState.pending.has(eventsKey)
+  ) {
+    apiState.pending.add(eventsKey);
+    fetchJson(
+      `/api/events?keyword=${encodeURIComponent(resort.name)}&countryCode=${encodeURIComponent(countryCodeFor(resort))}`,
+    )
+      .then((data) => {
+        apiState.eventsByResort[resort.id] = data.items || [];
+        render();
+      })
+      .catch(() => {})
+      .finally(() => apiState.pending.delete(eventsKey));
+  }
 }
 
 function hydrateVisibleData() {
   ensureConfigLoaded();
-  const activeResorts = new Set([selectedResort().id, ...filteredResorts().slice(0, 4).map((resort) => resort.id)]);
+  const leadResort = state.view === "discover" ? discoverFocusResort() : selectedResort();
+  const activeResorts = new Set([leadResort.id, ...filteredResorts().slice(0, 4).map((resort) => resort.id)]);
   resorts
     .filter((resort) => activeResorts.has(resort.id))
     .forEach((resort) => ensureResortApiData(resort));
+}
+
+function destroyDiscoverMap() {
+  if (!discoverMap) return;
+  discoverMap.remove();
+  discoverMap = null;
+}
+
+function mountDiscoverMap() {
+  if (state.view !== "discover") {
+    destroyDiscoverMap();
+    return;
+  }
+
+  const mapNode = document.getElementById("discover-map");
+  if (!mapNode || !window.L) return;
+
+  destroyDiscoverMap();
+
+  const filtered = filteredResorts();
+  const focus = discoverFocusResort();
+  discoverMap = window.L.map(mapNode, {
+    zoomControl: false,
+    minZoom: 2,
+    worldCopyJump: true,
+  });
+
+  window.L.control.zoom({ position: "topright" }).addTo(discoverMap);
+
+  window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+  }).addTo(discoverMap);
+
+  const bounds = [];
+  filtered.forEach((resort) => {
+    const marker = window.L.marker([resort.lat, resort.lon], {
+      icon: window.L.divIcon({
+        className: "resort-marker-wrap",
+        html: `<span class="resort-marker ${focus.id === resort.id ? "is-active" : ""}"></span>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      }),
+      title: resort.name,
+    });
+
+    marker.on("click", () => {
+      state.selectedResortId = resort.id;
+      render();
+    });
+
+    marker.bindTooltip(`${resort.name} - ${resort.country}`, {
+      direction: "top",
+      offset: [0, -12],
+    });
+
+    marker.addTo(discoverMap);
+    bounds.push([resort.lat, resort.lon]);
+  });
+
+  if (bounds.length === 1) {
+    discoverMap.setView(bounds[0], 8);
+  } else if (bounds.length > 1) {
+    discoverMap.fitBounds(bounds, { padding: [36, 36] });
+  } else {
+    discoverMap.setView([46.8, 8.2], 4);
+  }
+
+  window.setTimeout(() => discoverMap && discoverMap.invalidateSize(), 0);
 }
 
 function navButton(view, label) {
@@ -538,8 +695,8 @@ function quickEntry(title, copy, badgeClass, view) {
 }
 
 function render() {
-  const resort = selectedResort();
   persist();
+  destroyDiscoverMap();
   app.innerHTML = `
     <div class="topbar-wrap">
       <header class="topbar">
@@ -567,11 +724,11 @@ function render() {
     </div>
 
     <main class="page app-shell">${renderView()}</main>
-    ${renderDock(resort)}
     ${renderFooter()}
     ${renderMobileNav()}
   `;
   hydrateVisibleData();
+  mountDiscoverMap();
 }
 
 function renderView() {
@@ -735,8 +892,8 @@ function renderHome() {
     <section class="section stat-strip">
       <div class="section-head" style="margin-bottom: 20px;">
         <div>
-          <span class="eyebrow">Why this structure works</span>
-          <h2 style="color: white;">The new site leads with clarity, then expands into depth</h2>
+          <span class="eyebrow">Mountain planning</span>
+          <h2 style="color: white;">Clarity for discovery, depth for real trip planning</h2>
         </div>
       </div>
       <div class="stats-grid">
@@ -763,6 +920,10 @@ function renderHome() {
 
 function renderDiscover() {
   const filtered = filteredResorts();
+  const focus = discoverFocusResort();
+  const nearby = nearbyFor(focus);
+  const geo = skiGeoFor(focus);
+  const event = featuredEventFor(focus);
   const countries = ["All", ...new Set(resorts.map((resort) => resort.country))];
   const skills = ["All", ...new Set(resorts.map((resort) => resort.skill))];
   const vibes = ["All", ...new Set(resorts.map((resort) => resort.vibe))];
@@ -820,47 +981,63 @@ function renderDiscover() {
           </div>
         </div>
         <div class="panel">
-          <span class="mini-badge badge-lime">Improvement</span>
-          <h3 class="panel-title">Dense, but no longer noisy</h3>
-          <p>
-            Instead of three competing columns and static long lists, this explorer keeps the map, filters, and list in one decision-focused flow.
-          </p>
+          <span class="mini-badge badge-lime">Live data stack</span>
+          <h3 class="panel-title">Free public data, stitched into one resort explorer</h3>
+          <p>OpenStreetMap, Nominatim, and Open-Meteo feed the map, place context, and live snow signals right on this page.</p>
         </div>
       </aside>
       <section>
         <div class="discover-top">
-          <div class="mini-map">
-            <div class="map-caption">
-              <strong>${filtered.length} resorts matched</strong>
-              <div class="muted" style="color: rgba(255,255,255,0.78); margin-top: 4px;">Pins stay visible, details stay in the list, and the selected resort always has a clear next step.</div>
+          <div class="discover-map-card">
+            <div class="discover-map-wrap">
+              <div id="discover-map" class="discover-map" aria-label="Interactive map of ski resorts"></div>
+              <div class="discover-map-overlay">
+                <div class="map-caption">
+                  <strong>${filtered.length} resorts matched</strong>
+                  <div class="muted" style="color: rgba(255,255,255,0.78); margin-top: 4px;">Browse the live map, then keep the detailed decision-making in the list and resort brief.</div>
+                </div>
+                <div class="map-caption map-caption-secondary">
+                  <strong>${focus.name}</strong>
+                  <div class="muted" style="color: rgba(255,255,255,0.78); margin-top: 4px;">${formatAreaLabel(focus)}</div>
+                </div>
+              </div>
             </div>
-            ${filtered
-              .map(
-                (resort) => `
-                <button
-                  class="pin ${state.selectedResortId === resort.id ? "is-active" : ""}"
-                  style="left: calc(${resort.position.x}% - 8px); top: calc(${resort.position.y}% - 8px);"
-                  data-action="select-resort"
-                  data-id="${resort.id}"
-                  aria-label="Open ${resort.name}"
-                ></button>`,
-              )
-              .join("")}
           </div>
           <div class="panel">
             <span class="mini-badge badge-blue">Selected resort</span>
-            <h3 class="panel-title">${selectedResort().name}</h3>
-            <p>${selectedResort().summary}</p>
-            <div class="resort-meta" style="margin-top: 16px;">
-              <div class="meta-pill"><strong>${formatFreshSnow(selectedResort())}</strong><span>Fresh snow</span></div>
-              <div class="meta-pill"><strong>${formatSnowDepth(selectedResort())}</strong><span>Base depth</span></div>
-              <div class="meta-pill"><strong>${selectedResort().liftsOpen}</strong><span>Lifts open</span></div>
-              <div class="meta-pill"><strong>${selectedResort().price}</strong><span>Budget band</span></div>
+            <h3 class="panel-title">${focus.name}</h3>
+            <p>${focus.summary}</p>
+            <div class="provider-row">
+              <span class="mini-badge badge-blue">OpenStreetMap map</span>
+              <span class="mini-badge badge-lime">Nominatim</span>
+              <span class="mini-badge badge-warm">Open-Meteo</span>
+              ${serviceEnabled("events") ? `<span class="mini-badge badge-pine">Ticketmaster</span>` : ""}
             </div>
+            <div class="discover-side-grid" style="margin-top: 16px;">
+              <div class="meta-pill"><strong>${formatAreaLabel(focus)}</strong><span>Area label</span></div>
+              <div class="meta-pill"><strong>${formatCurrentTemp(focus)}</strong><span>Current temp</span></div>
+              <div class="meta-pill"><strong>${formatFreshSnow(focus)}</strong><span>Fresh snow</span></div>
+              <div class="meta-pill"><strong>${formatSnowDepth(focus)}</strong><span>Base depth</span></div>
+              <div class="meta-pill"><strong>${geo?.counts?.pistes ?? "..."}</strong><span>Mapped pistes</span></div>
+              <div class="meta-pill"><strong>${geo?.counts?.lifts ?? "..."}</strong><span>Mapped lifts</span></div>
+              <div class="meta-pill"><strong>${nearby?.counts?.lodging ?? "..."}</strong><span>Nearby stays</span></div>
+              <div class="meta-pill"><strong>${nearby?.counts?.dining ?? "..."}</strong><span>Food and bars</span></div>
+            </div>
+            <div class="chip-row" style="margin-top: 14px;">
+              <span class="chip">${focus.skill}</span>
+              <span class="chip">${focus.vibe}</span>
+              <span class="chip">${focus.price}</span>
+              <span class="chip">${focus.pass}</span>
+            </div>
+            ${
+              event
+                ? `<div class="panel-note" style="margin-top: 16px;"><strong>${event.title}</strong><span>${event.venue || event.city || focus.name}${event.date ? ` - ${event.date}` : ""}</span></div>`
+                : ""
+            }
             <div class="hero-actions" style="margin-top: 16px;">
-              <button class="pill-btn" data-action="navigate" data-view="resort">Open resort page</button>
-              <button class="ghost-btn" data-action="toggle-save" data-id="${selectedResort().id}">
-                ${state.savedResorts.has(selectedResort().id) ? "Saved to trips" : "Save resort"}
+              <button class="pill-btn" data-action="select-resort" data-id="${focus.id}">Open resort page</button>
+              <button class="ghost-btn" data-action="toggle-save" data-id="${focus.id}">
+                ${state.savedResorts.has(focus.id) ? "Saved to trips" : "Save resort"}
               </button>
             </div>
           </div>
@@ -889,7 +1066,8 @@ function renderDiscover() {
                 </div>
                 <div class="chip-row">${resort.reasons.map((reason) => `<span class="chip">${reason}</span>`).join("")}</div>
                 <div class="detail-actions">
-                  <button class="pill-btn" data-action="select-resort" data-id="${resort.id}">View details</button>
+                  <button class="pill-btn" data-action="preview-resort" data-id="${resort.id}">Preview on map</button>
+                  <button class="outline-btn" data-action="select-resort" data-id="${resort.id}">Open resort page</button>
                   <button class="outline-btn" data-action="toggle-compare" data-id="${resort.id}">
                     ${state.compareResorts.has(resort.id) ? "Remove compare" : "Compare"}
                   </button>
@@ -948,7 +1126,7 @@ function renderResort() {
           </div>
         </article>
         <article class="panel">
-          <span class="mini-badge badge-warm">Best parts to keep</span>
+          <span class="mini-badge badge-warm">Highlights</span>
           <h3 class="panel-title">Resort content organized by decision, not by noise</h3>
           <div class="card-grid" style="margin-top: 16px;">
             ${resort.highlights
@@ -1072,7 +1250,7 @@ function renderPlanner() {
         <div class="summary-card">
           <span class="mini-badge badge-blue">Trip progress</span>
           <h3>${plannerCompletion()}% complete</h3>
-          <p>${resort.name} is currently your lead resort. Saved stays, offers, and alerts all feed this plan automatically.</p>
+          <p>${resort.name} is currently your selected resort. Saved stays, offers, and alerts all feed this plan automatically.</p>
         </div>
         <div class="summary-card">
           <span class="mini-badge badge-lime">Current destination</span>
@@ -1109,7 +1287,7 @@ function renderPlanner() {
           </div>
         </div>
         <div class="summary-card">
-          <span class="mini-badge badge-blue">Useful improvement</span>
+          <span class="mini-badge badge-blue">Budget snapshot</span>
           <p>Offers and package benchmarks feed directly into one actionable budget view.</p>
         </div>
       </aside>
@@ -1129,8 +1307,8 @@ function renderExpert() {
     <section class="section-head">
       <div>
         <span class="eyebrow" style="background: rgba(46,102,255,0.12); color: var(--brand-strong);">Expert AI</span>
-        <h2>Helpful guidance without vague labels</h2>
-        <p>The navigation says exactly what this tool does: it answers planning questions, explains why a resort fits, and pushes useful actions into the rest of the site.</p>
+        <h2>Helpful guidance for trip decisions</h2>
+        <p>This tool answers planning questions, explains why a resort fits, and pushes useful actions into the rest of the site.</p>
       </div>
     </section>
     <div class="expert-layout">
@@ -1175,7 +1353,7 @@ function renderExpert() {
           </div>
         </div>
         <div class="summary-card">
-          <span class="mini-badge badge-warm">Current lead resort</span>
+          <span class="mini-badge badge-warm">Current resort focus</span>
           <h3>${resort.name}</h3>
           <p>${resort.reasons.join(", ")}.</p>
         </div>
@@ -1192,7 +1370,7 @@ function renderDashboard() {
       <div>
         <span class="eyebrow" style="background: rgba(31,95,84,0.12); color: var(--pine);">My trips</span>
         <h2>Saved resorts, compares, alerts, and active planning in one place</h2>
-        <p>Instead of a vague “dashboard,” this area is explicitly about trip momentum and decision tracking.</p>
+        <p>This area keeps your trip momentum, saved places, and live decision signals together.</p>
       </div>
     </section>
     <div class="dashboard-layout">
@@ -1201,7 +1379,7 @@ function renderDashboard() {
           <article class="summary-card">
             <span class="mini-badge badge-blue">Saved resorts</span>
             <h3>${saved.length}</h3>
-            <p>Resorts you want to revisit or use as lead candidates.</p>
+            <p>Resorts you want to revisit or keep in the shortlist.</p>
           </article>
           <article class="summary-card">
             <span class="mini-badge badge-lime">Compare set</span>
@@ -1276,25 +1454,6 @@ function renderDashboard() {
   `;
 }
 
-function renderDock(resort) {
-  const compare = resorts.filter((item) => state.compareResorts.has(item.id) && item.id !== resort.id);
-  return `
-    <div class="dock">
-      <div class="dock-panel">
-        <div class="dock-col">
-          <strong>Current lead:</strong>
-          <span class="dock-chip">${resort.name}</span>
-          ${compare.map((item) => `<span class="dock-chip">${item.name}</span>`).join("")}
-        </div>
-        <div class="dock-col">
-          <button class="ghost-btn" data-action="navigate" data-view="resort">Resort page</button>
-          <button class="ghost-btn" data-action="navigate" data-view="planner">Trip planner</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 function renderFooter() {
   return `
     <footer class="footer">
@@ -1319,9 +1478,11 @@ function renderFooter() {
         </div>
         <div>
           <ul>
+            <li>Map tiles: ${serviceStatusLabel("mapTiles")}</li>
+            <li>Geocoding: ${serviceStatusLabel("geocoding")}</li>
             <li>Weather: ${serviceStatusLabel("weather")}</li>
             <li>Ski geodata: ${serviceStatusLabel("skiGeo")}</li>
-            <li>Hotels / flights / events can be activated with API keys in .env</li>
+            <li>Events: ${serviceStatusLabel("events")}</li>
           </ul>
         </div>
       </div>
@@ -1354,7 +1515,7 @@ function renderMobileNav() {
 function buildExpertAnswer(resort, question) {
   return {
     title: `Best fit right now: ${resort.name}`,
-    summary: `For "${question}", I would lead with ${resort.name}. It combines ${resort.reasons[0].toLowerCase()}, ${resort.reasons[1].toLowerCase()}, and a planning setup that remains practical once flights, lodging, and resort logistics are added. The improved site structure keeps that recommendation transparent by showing the snow window, stay style, and event context in one place rather than scattering them across separate pages.`,
+    summary: `For "${question}", I would start with ${resort.name}. It combines ${resort.reasons[0].toLowerCase()}, ${resort.reasons[1].toLowerCase()}, and a planning setup that stays practical once flights, lodging, and resort logistics are added. The recommendation stays transparent by showing the snow window, stay style, and event context in one place.`,
     points: [
       { label: "Why it fits", value: resort.reasons.join(", ") },
       { label: "Watch next", value: resort.alerts },
@@ -1388,6 +1549,11 @@ document.addEventListener("click", (event) => {
   if (action === "select-resort") {
     state.selectedResortId = target.dataset.id;
     state.view = "resort";
+  }
+
+  if (action === "preview-resort") {
+    state.selectedResortId = target.dataset.id;
+    state.view = "discover";
   }
 
   if (action === "toggle-save") {

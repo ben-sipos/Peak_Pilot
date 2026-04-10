@@ -7,6 +7,10 @@ loadDotEnv();
 
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
+const USER_AGENT = "PeakPilotAlpine/1.0 (+https://localhost)";
+const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
+const TICKETMASTER_URL = "https://app.ticketmaster.com/discovery/v2/events.json";
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -20,7 +24,6 @@ const MIME_TYPES = {
   ".ico": "image/x-icon",
 };
 
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
 const FALLBACK_SKI_GEO = {
   zermatt: { pistes: 322, lifts: 54, stations: 29 },
   "saint-anton": { pistes: 305, lifts: 85, stations: 38 },
@@ -71,8 +74,11 @@ function parseNumber(value) {
 
 function getIntegrationStatus() {
   return {
+    mapTiles: { enabled: true, provider: "OpenStreetMap Tiles" },
+    geocoding: { enabled: true, provider: "Nominatim" },
     weather: { enabled: true, provider: "Open-Meteo" },
     skiGeo: { enabled: true, provider: "OpenStreetMap Overpass" },
+    nearby: { enabled: true, provider: "OpenStreetMap Overpass" },
     hotels: {
       enabled: Boolean(process.env.BOOKING_API_KEY || process.env.EXPEDIA_API_KEY),
       provider: process.env.BOOKING_API_KEY ? "Booking.com Demand API" : process.env.EXPEDIA_API_KEY ? "Expedia Rapid" : null,
@@ -86,6 +92,20 @@ function getIntegrationStatus() {
       provider: process.env.TICKETMASTER_API_KEY ? "Ticketmaster Discovery" : null,
     },
   };
+}
+
+async function fetchRemoteJson(url, options = {}) {
+  const headers = {
+    Accept: "application/json",
+    "User-Agent": USER_AGENT,
+    ...(options.headers || {}),
+  };
+
+  const response = await fetch(url, { ...options, headers });
+  if (!response.ok) {
+    throw new Error(`Remote API error: ${response.status}`);
+  }
+  return response.json();
 }
 
 async function fetchWeather(lat, lon) {
@@ -103,12 +123,7 @@ async function fetchWeather(lat, lon) {
   url.searchParams.set("forecast_days", "5");
   url.searchParams.set("timezone", "auto");
 
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Open-Meteo error: ${response.status}`);
-  }
-
-  const data = await response.json();
+  const data = await fetchRemoteJson(url);
   return {
     provider: "Open-Meteo",
     current: {
@@ -141,7 +156,10 @@ out body geom;
 
   const response = await fetch(OVERPASS_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "User-Agent": USER_AGENT,
+    },
     body: new URLSearchParams({ data: query }),
   });
 
@@ -172,6 +190,106 @@ out body geom;
       stations: stations.length,
     },
     difficulties: difficultyCounts,
+  };
+}
+
+async function fetchLocationContext(lat, lon) {
+  const url = new URL("/reverse", NOMINATIM_URL);
+  url.searchParams.set("format", "jsonv2");
+  url.searchParams.set("lat", String(lat));
+  url.searchParams.set("lon", String(lon));
+  url.searchParams.set("zoom", "10");
+  url.searchParams.set("addressdetails", "1");
+
+  const data = await fetchRemoteJson(url);
+  const address = data.address || {};
+  const placeName =
+    address.village ||
+    address.town ||
+    address.city ||
+    address.municipality ||
+    address.county ||
+    data.name ||
+    null;
+  const areaBits = [placeName, address.state || address.region || address.country].filter(Boolean);
+
+  return {
+    provider: "Nominatim",
+    label: placeName || data.display_name || null,
+    areaLabel: areaBits.join(", ") || data.display_name || null,
+    displayName: data.display_name || null,
+    address: {
+      country: address.country || null,
+      state: address.state || address.region || null,
+      county: address.county || null,
+    },
+  };
+}
+
+async function fetchNearbyPlaces(lat, lon) {
+  const query = `
+[out:json][timeout:25];
+(
+  node(around:9000,${lat},${lon})["tourism"~"hotel|apartment|guest_house|hostel|chalet"];
+  way(around:9000,${lat},${lon})["tourism"~"hotel|apartment|guest_house|hostel|chalet"];
+  node(around:9000,${lat},${lon})["amenity"~"restaurant|cafe|bar|pub|fast_food"];
+  way(around:9000,${lat},${lon})["amenity"~"restaurant|cafe|bar|pub|fast_food"];
+  node(around:9000,${lat},${lon})["shop"~"ski|sports|outdoor"];
+  way(around:9000,${lat},${lon})["shop"~"ski|sports|outdoor"];
+);
+out tags;
+`;
+
+  const response = await fetch(OVERPASS_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+      "User-Agent": USER_AGENT,
+    },
+    body: new URLSearchParams({ data: query }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Overpass nearby error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  const elements = Array.isArray(data.elements) ? data.elements : [];
+  const lodgingTags = new Set(["hotel", "apartment", "guest_house", "hostel", "chalet"]);
+  const diningTags = new Set(["restaurant", "cafe", "bar", "pub", "fast_food"]);
+  const rentalTags = new Set(["ski", "sports", "outdoor"]);
+
+  return {
+    provider: "OpenStreetMap Overpass",
+    counts: {
+      lodging: elements.filter((item) => lodgingTags.has(item.tags?.tourism)).length,
+      dining: elements.filter((item) => diningTags.has(item.tags?.amenity)).length,
+      rentals: elements.filter((item) => rentalTags.has(item.tags?.shop)).length,
+    },
+  };
+}
+
+async function fetchTicketmasterEvents(keyword, countryCode) {
+  const url = new URL(TICKETMASTER_URL);
+  url.searchParams.set("apikey", process.env.TICKETMASTER_API_KEY);
+  url.searchParams.set("keyword", keyword);
+  url.searchParams.set("size", "4");
+  url.searchParams.set("sort", "date,asc");
+  if (countryCode) url.searchParams.set("countryCode", countryCode);
+
+  const data = await fetchRemoteJson(url);
+  const events = data._embedded?.events || [];
+
+  return {
+    provider: "Ticketmaster Discovery",
+    items: events.map((event) => ({
+      id: event.id,
+      title: event.name,
+      date: event.dates?.start?.localDate || null,
+      venue: event._embedded?.venues?.[0]?.name || null,
+      city: event._embedded?.venues?.[0]?.city?.name || null,
+      url: event.url || null,
+    })),
   };
 }
 
@@ -216,6 +334,22 @@ async function handleApi(req, res, url) {
     return true;
   }
 
+  if (url.pathname === "/api/location") {
+    const lat = parseNumber(url.searchParams.get("lat"));
+    const lon = parseNumber(url.searchParams.get("lon"));
+    if (lat === null || lon === null) {
+      sendJson(res, 400, { ok: false, message: "lat and lon are required" });
+      return true;
+    }
+    try {
+      const location = await fetchLocationContext(lat, lon);
+      sendJson(res, 200, { ok: true, ...location });
+    } catch (error) {
+      sendJson(res, 502, { ok: false, message: error.message });
+    }
+    return true;
+  }
+
   if (url.pathname === "/api/ski-geo") {
     const lat = parseNumber(url.searchParams.get("lat"));
     const lon = parseNumber(url.searchParams.get("lon"));
@@ -241,6 +375,22 @@ async function handleApi(req, res, url) {
       } else {
         sendJson(res, 502, { ok: false, message: error.message });
       }
+    }
+    return true;
+  }
+
+  if (url.pathname === "/api/nearby") {
+    const lat = parseNumber(url.searchParams.get("lat"));
+    const lon = parseNumber(url.searchParams.get("lon"));
+    if (lat === null || lon === null) {
+      sendJson(res, 400, { ok: false, message: "lat and lon are required" });
+      return true;
+    }
+    try {
+      const nearby = await fetchNearbyPlaces(lat, lon);
+      sendJson(res, 200, { ok: true, ...nearby });
+    } catch (error) {
+      sendJson(res, 502, { ok: false, message: error.message });
     }
     return true;
   }
@@ -276,11 +426,18 @@ async function handleApi(req, res, url) {
       sendJson(res, 501, notConfiguredMessage("events", ["TICKETMASTER_API_KEY"]));
       return true;
     }
-    sendJson(res, 501, {
-      ok: false,
-      service: "events",
-      message: "Event adapter wiring is prepared, but event search filters still need to be mapped to your region/resort model.",
-    });
+    const keyword = url.searchParams.get("keyword");
+    const countryCode = url.searchParams.get("countryCode");
+    if (!keyword) {
+      sendJson(res, 400, { ok: false, message: "keyword is required" });
+      return true;
+    }
+    try {
+      const events = await fetchTicketmasterEvents(keyword, countryCode);
+      sendJson(res, 200, { ok: true, ...events });
+    } catch (error) {
+      sendJson(res, 502, { ok: false, message: error.message });
+    }
     return true;
   }
 

@@ -479,8 +479,7 @@ img {
   overflow: hidden;
 }
 
-.feature-visual::before,
-.mini-map::before {
+.feature-visual::before {
   content: "";
   position: absolute;
   inset: 10% auto auto 8%;
@@ -615,8 +614,7 @@ img {
 }
 
 .sidebar .panel + .panel,
-.stack > * + *,
-.dock-col > * + * {
+.stack > * + * {
   margin-top: 16px;
 }
 
@@ -678,25 +676,71 @@ img {
   margin-bottom: 20px;
 }
 
-.mini-map {
-  min-height: 320px;
-  border-radius: 26px;
-  background:
-    linear-gradient(160deg, rgba(46, 102, 255, 0.16), rgba(126, 227, 242, 0.08)),
-    linear-gradient(180deg, #f7fbff, #ecf3fb);
+.discover-map-card {
+  min-width: 0;
+}
+
+.discover-map-wrap {
   position: relative;
+  border-radius: 26px;
   overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  min-height: 420px;
+}
+
+.discover-map {
+  height: 420px;
+  width: 100%;
+  background: linear-gradient(180deg, #edf5fe, #dfeaf6);
+}
+
+.discover-map-overlay {
+  position: absolute;
+  inset: 18px 18px auto 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  pointer-events: none;
 }
 
 .map-caption {
-  position: absolute;
-  left: 20px;
-  top: 20px;
   padding: 12px 14px;
   border-radius: 16px;
   background: rgba(17, 39, 78, 0.85);
   color: white;
-  max-width: 260px;
+  max-width: 280px;
+  pointer-events: auto;
+}
+
+.map-caption-secondary {
+  margin-left: auto;
+}
+
+.provider-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.discover-side-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.panel-note {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(17, 39, 78, 0.06);
+  border: 1px solid rgba(17, 39, 78, 0.08);
+}
+
+.panel-note span {
+  color: var(--text-soft);
 }
 
 .resort-list {
@@ -884,43 +928,48 @@ img {
   border: 1px solid rgba(46, 102, 255, 0.1);
 }
 
-.dock {
-  position: fixed;
-  left: 16px;
-  right: 16px;
-  bottom: 16px;
-  z-index: 60;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
+.resort-marker-wrap {
+  background: transparent;
+  border: 0;
 }
 
-.dock-panel {
-  width: min(960px, 100%);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 18px;
-  border-radius: 24px;
-  pointer-events: all;
-  background: rgba(17, 39, 78, 0.92);
-  color: white;
-  box-shadow: 0 24px 60px rgba(5, 19, 46, 0.28);
+.resort-marker {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  border: 2px solid white;
+  box-shadow: 0 0 0 5px rgba(46, 102, 255, 0.18);
 }
 
-.dock-col {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+.resort-marker.is-active {
+  width: 22px;
+  height: 22px;
+  margin: -2px;
+  background: linear-gradient(135deg, var(--brand-strong), var(--accent-lime));
+  box-shadow: 0 0 0 8px rgba(204, 242, 108, 0.32);
 }
 
-.dock-chip {
-  background: rgba(255, 255, 255, 0.1);
+.leaflet-container {
+  font-family: "Manrope", sans-serif;
+}
+
+.leaflet-control-zoom {
+  border: 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.leaflet-control-zoom a {
+  color: var(--text);
+}
+
+.leaflet-tooltip {
+  border: 0;
   border-radius: 999px;
-  padding: 10px 12px;
-  font-weight: 700;
+  box-shadow: var(--shadow-soft);
+  color: var(--text);
+  font-weight: 800;
 }
 
 .footer {
@@ -980,7 +1029,8 @@ img {
   .snow-grid,
   .dashboard-cards,
   .planner-grid,
-  .detail-grid {
+  .detail-grid,
+  .discover-side-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1021,7 +1071,8 @@ img {
   .dashboard-cards,
   .planner-grid,
   .detail-grid,
-  .resort-meta {
+  .resort-meta,
+  .discover-side-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1031,11 +1082,6 @@ img {
   }
 
   .hero-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .dock-panel {
     flex-direction: column;
     align-items: stretch;
   }

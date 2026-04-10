@@ -25,6 +25,13 @@ http://localhost:3000
 
 ## Live APIs already wired
 
+- `OpenStreetMap Tiles`
+  - Used directly in the discovery map
+
+- `Nominatim`
+  - `/api/location`
+  - Used for reverse geocoding and live resort area labels
+
 - `Open-Meteo`
   - `/api/weather`
   - Used for current temperature, snow depth, and forecast snowfall
@@ -32,17 +39,20 @@ http://localhost:3000
 - `OpenStreetMap Overpass`
   - `/api/ski-geo`
   - Used for nearby pistes, lifts, and station counts
+  - `/api/nearby`
+  - Used for nearby stays, dining, and rental counts
 
-## Private API adapters scaffolded
+## Free-tier API adapters ready when keys are added
+
+- `Ticketmaster Discovery`
+  - `/api/events`
+  - Real event lookup is wired, but still needs your free key
 
 - `Booking.com Demand API` or `Expedia Rapid`
   - `/api/hotels`
 
 - `Amadeus Self-Service`
   - `/api/flights`
-
-- `Ticketmaster Discovery`
-  - `/api/events`
 
 These routes are intentionally server-side so credentials do not need to live in browser code.
 
@@ -60,5 +70,6 @@ Main ones:
 
 ## Notes
 
-- The current UI uses live weather and ski-geodata where available.
-- Hotels, flights, and events are scaffolded but still need your keys and final provider mapping.
+- The discovery page now uses a real OpenStreetMap-backed map with resort overlays.
+- The current UI uses live weather, geocoding, and ski/place geodata where available.
+- Flights and hotels still need your keys and final provider mapping.

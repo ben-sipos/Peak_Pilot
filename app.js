@@ -1397,7 +1397,7 @@ function render() {
     <div class="topbar-wrap">
       <header class="topbar">
         <button class="brand" data-action="navigate" data-view="home" aria-label="Go to homepage">
-          <span class="brand-mark"><img src="/logo.png" alt="PeakPilot" /></span>
+          <span class="brand-mark"><img src="logo.png" alt="PeakPilot Alpine Intelligence" /></span>
           <span class="brand-copy">
             <strong>PeakPilot Alpine Intelligence</strong>
           </span>
@@ -2209,7 +2209,7 @@ function renderFooter() {
       <div class="footer-grid">
         <div>
           <div class="brand">
-            <span class="brand-mark"><img src="/logo.png" /></span>
+            <span class="brand-mark"><img src="logo.png" alt="PeakPilot Alpine Intelligence" /></span>
             <span class="brand-copy">
               <strong style="color: white;">PeakPilot Alpine Intelligence</strong>
               <span style="color: rgba(255,255,255,0.64);">Modern resort discovery with serious trip utility</span>

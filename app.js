@@ -484,6 +484,139 @@ function featuredEventFor(resort) {
   return eventsFor(resort)[0] || null;
 }
 
+function weatherLabelFromCode(code) {
+  const labels = {
+    0: "Clear",
+    1: "Mostly clear",
+    2: "Partly cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Rime fog",
+    51: "Light drizzle",
+    53: "Drizzle",
+    55: "Dense drizzle",
+    56: "Freezing drizzle",
+    57: "Heavy freezing drizzle",
+    61: "Light rain",
+    63: "Rain",
+    65: "Heavy rain",
+    66: "Freezing rain",
+    67: "Heavy freezing rain",
+    71: "Light snow",
+    73: "Snow",
+    75: "Heavy snow",
+    77: "Snow grains",
+    80: "Rain showers",
+    81: "Heavy showers",
+    82: "Violent showers",
+    85: "Snow showers",
+    86: "Heavy snow showers",
+    95: "Thunderstorm",
+    96: "Storm and hail",
+    99: "Severe storm",
+  };
+  return labels[code] || "Mountain weather";
+}
+
+function formatTempValue(value) {
+  if (value == null) return "--";
+  return `${Math.round(value)}C`;
+}
+
+function formatWindValue(value) {
+  if (value == null) return "--";
+  return `${Math.round(value)} km/h`;
+}
+
+function formatPrecipValue(value) {
+  if (value == null) return "--";
+  return `${Math.round(value)} mm`;
+}
+
+function shortDayLabel(value) {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { weekday: "short" });
+}
+
+function shortDateLabel(value) {
+  const date = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+function formatCurrentWeatherLabel(resort) {
+  if (!weatherFor(resort)?.current) return "Loading";
+  return weatherLabelFromCode(weatherFor(resort)?.current?.weatherCode);
+}
+
+function currentTempLabel(resort) {
+  if (weatherFor(resort)?.current?.temperatureC != null) {
+    return formatTempValue(weatherFor(resort).current.temperatureC);
+  }
+  const match = String(resort.temp).match(/-?\d+/);
+  return match ? `${match[0]}C` : String(resort.temp);
+}
+
+function renderForecastStrip(resort, count = 3) {
+  const weather = weatherFor(resort);
+  if (!weather?.daily?.length) {
+    return `
+      <div class="forecast-strip">
+        <div class="forecast-card">
+          <small>Forecast</small>
+          <strong>Loading</strong>
+          <span>Live weather is still being fetched for ${resort.name}.</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="forecast-strip">
+      ${weather.daily.slice(0, count).map(
+        (day) => `
+        <div class="forecast-card">
+          <small>${shortDayLabel(day.date)} · ${shortDateLabel(day.date)}</small>
+          <strong>${weatherLabelFromCode(day.weatherCode)}</strong>
+          <span>${formatTempValue(day.tempMaxC)} high · ${formatTempValue(day.tempMinC)} low</span>
+          <span>${Math.round(day.snowfallCm ?? 0)} cm snow · ${Math.round(day.precipProbabilityMax ?? 0)}% precip</span>
+        </div>`,
+      ).join("")}
+    </div>
+  `;
+}
+
+function renderForecastGrid(resort) {
+  const weather = weatherFor(resort);
+  if (!weather?.daily?.length) {
+    return `
+      <div class="forecast-grid">
+        <div class="forecast-card">
+          <small>Forecast</small>
+          <strong>Loading</strong>
+          <span>Live daily forecast is still being fetched for ${resort.name}.</span>
+        </div>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="forecast-grid">
+      ${weather.daily.map(
+        (day) => `
+        <div class="forecast-card">
+          <small>${shortDayLabel(day.date)}</small>
+          <strong>${weatherLabelFromCode(day.weatherCode)}</strong>
+          <span>${formatTempValue(day.tempMaxC)} / ${formatTempValue(day.tempMinC)}</span>
+          <span>${Math.round(day.snowfallCm ?? 0)} cm snow</span>
+          <span>${Math.round(day.precipProbabilityMax ?? 0)}% precip · ${formatWindValue(day.windSpeedMaxKmh)}</span>
+        </div>`,
+      ).join("")}
+    </div>
+  `;
+}
+
 function integrationSummary() {
   if (!canUseApi()) {
     return "API adapters are available when you run the local server.";
@@ -1015,13 +1148,19 @@ function renderDiscover() {
             </div>
             <div class="discover-side-grid" style="margin-top: 16px;">
               <div class="meta-pill"><strong>${formatAreaLabel(focus)}</strong><span>Area label</span></div>
-              <div class="meta-pill"><strong>${formatCurrentTemp(focus)}</strong><span>Current temp</span></div>
+              <div class="meta-pill"><strong>${formatCurrentWeatherLabel(focus)}</strong><span>Current sky</span></div>
+              <div class="meta-pill"><strong>${currentTempLabel(focus)}</strong><span>Current temp</span></div>
+              <div class="meta-pill"><strong>${formatTempValue(weatherFor(focus)?.current?.apparentTemperatureC)}</strong><span>Feels like</span></div>
               <div class="meta-pill"><strong>${formatFreshSnow(focus)}</strong><span>Fresh snow</span></div>
               <div class="meta-pill"><strong>${formatSnowDepth(focus)}</strong><span>Base depth</span></div>
+              <div class="meta-pill"><strong>${formatWindValue(weatherFor(focus)?.current?.windSpeedKmh)}</strong><span>Wind now</span></div>
               <div class="meta-pill"><strong>${geo?.counts?.pistes ?? "..."}</strong><span>Mapped pistes</span></div>
               <div class="meta-pill"><strong>${geo?.counts?.lifts ?? "..."}</strong><span>Mapped lifts</span></div>
               <div class="meta-pill"><strong>${nearby?.counts?.lodging ?? "..."}</strong><span>Nearby stays</span></div>
               <div class="meta-pill"><strong>${nearby?.counts?.dining ?? "..."}</strong><span>Food and bars</span></div>
+            </div>
+            <div style="margin-top: 16px;">
+              ${renderForecastStrip(focus, 3)}
             </div>
             <div class="chip-row" style="margin-top: 14px;">
               <span class="chip">${focus.skill}</span>
@@ -1061,6 +1200,8 @@ function renderDiscover() {
                 <div class="resort-meta">
                   <div class="meta-pill"><strong>${resort.skill}</strong><span>Best skill fit</span></div>
                   <div class="meta-pill"><strong>${resort.vibe}</strong><span>Trip style</span></div>
+                  <div class="meta-pill"><strong>${formatCurrentWeatherLabel(resort)}</strong><span>Current weather</span></div>
+                  <div class="meta-pill"><strong>${currentTempLabel(resort)}</strong><span>Temp now</span></div>
                   <div class="meta-pill"><strong>${formatFreshSnow(resort)}</strong><span>New snow</span></div>
                   <div class="meta-pill"><strong>${resort.pass}</strong><span>Pass info</span></div>
                 </div>
@@ -1126,6 +1267,20 @@ function renderResort() {
           </div>
         </article>
         <article class="panel">
+          <span class="mini-badge badge-blue">Live weather and forecast</span>
+          <div class="detail-grid" style="margin-top: 14px;">
+            <div class="metric"><small>Current sky</small><strong>${formatCurrentWeatherLabel(resort)}</strong></div>
+            <div class="metric"><small>Current temp</small><strong>${currentTempLabel(resort)}</strong></div>
+            <div class="metric"><small>Feels like</small><strong>${formatTempValue(weatherFor(resort)?.current?.apparentTemperatureC)}</strong></div>
+            <div class="metric"><small>Wind now</small><strong>${formatWindValue(weatherFor(resort)?.current?.windSpeedKmh)}</strong></div>
+            <div class="metric"><small>Precipitation now</small><strong>${formatPrecipValue(weatherFor(resort)?.current?.precipitationMm)}</strong></div>
+            <div class="metric"><small>Forecast source</small><strong>${weatherFor(resort)?.provider || "Open-Meteo"}</strong></div>
+          </div>
+          <div style="margin-top: 16px;">
+            ${renderForecastGrid(resort)}
+          </div>
+        </article>
+        <article class="panel">
           <span class="mini-badge badge-warm">Highlights</span>
           <h3 class="panel-title">Resort content organized by decision, not by noise</h3>
           <div class="card-grid" style="margin-top: 16px;">
@@ -1143,12 +1298,17 @@ function renderResort() {
       </section>
       <aside class="sticky-panel stack">
         <div class="summary-card">
-          <span class="mini-badge badge-blue">Snow watch</span>
-          <h3>${resort.alerts}</h3>
-          <p>${formatCurrentTemp(resort)} expected tomorrow with ${resort.liftsOpen} of lifts currently running.</p>
+          <span class="mini-badge badge-blue">Weather now</span>
+          <h3>${formatCurrentWeatherLabel(resort)}</h3>
+          <p>${currentTempLabel(resort)} now, feels like ${formatTempValue(weatherFor(resort)?.current?.apparentTemperatureC)}, with wind around ${formatWindValue(weatherFor(resort)?.current?.windSpeedKmh)}.</p>
           <div class="hero-actions" style="margin-top: 16px;">
             <button class="outline-btn" data-action="navigate" data-view="snow">Open snow hub</button>
           </div>
+        </div>
+        <div class="summary-card">
+          <span class="mini-badge badge-warm">Next snow signal</span>
+          <h3>${resort.alerts}</h3>
+          <p>${formatFreshSnow(resort)} fresh snow in the current forecast window with ${formatSnowDepth(resort)} base depth.</p>
         </div>
         <div class="summary-card">
           <span class="mini-badge badge-lime">Live map data</span>
@@ -1209,7 +1369,7 @@ function renderSnow() {
                   <div><strong>${formatSnowDepth(resort)}</strong><small>Base</small></div>
                   <div><strong>${formatFreshSnow(resort)}</strong><small>New snow</small></div>
                   <div><strong>${resort.liftsOpen}</strong><small>Lifts open</small></div>
-                  <div><strong>${formatCurrentTemp(resort)}</strong><small>Temp</small></div>
+                  <div><strong>${currentTempLabel(resort)}</strong><small>Temp</small></div>
                 </div>`,
               )
               .join("")}

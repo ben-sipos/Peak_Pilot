@@ -114,11 +114,22 @@ async function fetchWeather(lat, lon) {
   url.searchParams.set("longitude", String(lon));
   url.searchParams.set(
     "current",
-    ["temperature_2m", "snow_depth", "weather_code", "wind_speed_10m"].join(","),
+    ["temperature_2m", "apparent_temperature", "precipitation", "snow_depth", "weather_code", "wind_speed_10m"].join(","),
   );
   url.searchParams.set(
     "daily",
-    ["temperature_2m_max", "temperature_2m_min", "snowfall_sum", "precipitation_probability_max"].join(","),
+    [
+      "weather_code",
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "snowfall_sum",
+      "precipitation_probability_max",
+      "wind_speed_10m_max",
+    ].join(","),
+  );
+  url.searchParams.set(
+    "hourly",
+    ["temperature_2m", "precipitation_probability", "weather_code", "wind_speed_10m"].join(","),
   );
   url.searchParams.set("forecast_days", "5");
   url.searchParams.set("timezone", "auto");
@@ -128,6 +139,8 @@ async function fetchWeather(lat, lon) {
     provider: "Open-Meteo",
     current: {
       temperatureC: data.current?.temperature_2m ?? null,
+      apparentTemperatureC: data.current?.apparent_temperature ?? null,
+      precipitationMm: data.current?.precipitation ?? null,
       snowDepthM: data.current?.snow_depth ?? null,
       windSpeedKmh: data.current?.wind_speed_10m ?? null,
       weatherCode: data.current?.weather_code ?? null,
@@ -135,10 +148,19 @@ async function fetchWeather(lat, lon) {
     },
     daily: (data.daily?.time || []).map((time, index) => ({
       date: time,
+      weatherCode: data.daily.weather_code?.[index] ?? null,
       tempMaxC: data.daily.temperature_2m_max?.[index] ?? null,
       tempMinC: data.daily.temperature_2m_min?.[index] ?? null,
       snowfallCm: data.daily.snowfall_sum?.[index] ?? null,
       precipProbabilityMax: data.daily.precipitation_probability_max?.[index] ?? null,
+      windSpeedMaxKmh: data.daily.wind_speed_10m_max?.[index] ?? null,
+    })),
+    hourly: (data.hourly?.time || []).slice(0, 12).map((time, index) => ({
+      time,
+      temperatureC: data.hourly.temperature_2m?.[index] ?? null,
+      precipitationProbability: data.hourly.precipitation_probability?.[index] ?? null,
+      weatherCode: data.hourly.weather_code?.[index] ?? null,
+      windSpeedKmh: data.hourly.wind_speed_10m?.[index] ?? null,
     })),
   };
 }

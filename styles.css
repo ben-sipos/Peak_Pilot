@@ -65,7 +65,8 @@ img {
 .topbar-wrap {
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 1200;
+  isolation: isolate;
   backdrop-filter: blur(20px);
   background: rgba(248, 252, 255, 0.76);
   border-bottom: 1px solid rgba(19, 41, 76, 0.08);
@@ -743,6 +744,44 @@ img {
   color: var(--text-soft);
 }
 
+.forecast-strip,
+.forecast-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.forecast-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.forecast-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.forecast-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(242, 247, 253, 0.9);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.forecast-card strong,
+.forecast-card small,
+.forecast-card span {
+  display: block;
+}
+
+.forecast-card strong {
+  font-size: 1rem;
+  margin: 6px 0 4px;
+}
+
+.forecast-card span {
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
 .resort-list {
   display: grid;
   gap: 16px;
@@ -972,6 +1011,11 @@ img {
   font-weight: 800;
 }
 
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 700;
+}
+
 .footer {
   margin-top: 40px;
   background: #0f2144;
@@ -1030,7 +1074,9 @@ img {
   .dashboard-cards,
   .planner-grid,
   .detail-grid,
-  .discover-side-grid {
+  .discover-side-grid,
+  .forecast-grid,
+  .forecast-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -1072,7 +1118,9 @@ img {
   .planner-grid,
   .detail-grid,
   .resort-meta,
-  .discover-side-grid {
+  .discover-side-grid,
+  .forecast-grid,
+  .forecast-strip {
     grid-template-columns: 1fr;
   }
 

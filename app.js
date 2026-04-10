@@ -1232,16 +1232,20 @@ function hydrateVisibleData() {
     .forEach((resort) => ensureResortApiData(resort));
 }
 
+let discoverLayerGroup = null;
+
 function destroyDiscoverMap() {
   if (!discoverMap) return;
   discoverMap.remove();
   discoverMap = null;
+  discoverLayerGroup = null;
 }
 
 function destroyResortDetailMap() {
   if (!resortDetailMap) return;
   resortDetailMap.remove();
   resortDetailMap = null;
+  // Note: resort detail map doesn't strictly need a layergroup since it's just one static pin, but we'll preserve it cleanly.
 }
 
 function mountDiscoverMap() {
@@ -1253,24 +1257,31 @@ function mountDiscoverMap() {
   const mapNode = document.getElementById("discover-map");
   if (!mapNode || !window.L) return;
 
-  destroyDiscoverMap();
-
   const filtered = filteredResorts();
   const focus = discoverFocusResort();
-  discoverMap = window.L.map(mapNode, {
-    zoomControl: false,
-    minZoom: 2,
-    worldCopyJump: true,
-  });
 
-  window.L.control.zoom({ position: "topright" }).addTo(discoverMap);
+  if (!discoverMap) {
+    discoverMap = window.L.map(mapNode, {
+      zoomControl: false,
+      minZoom: 2,
+      worldCopyJump: true,
+    });
+    window.L.control.zoom({ position: "topright" }).addTo(discoverMap);
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(discoverMap);
+    discoverLayerGroup = window.L.layerGroup().addTo(discoverMap);
 
-  window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18,
-  }).addTo(discoverMap);
+    const bounds = [];
+    filtered.forEach((resort) => bounds.push([resort.lat, resort.lon]));
+    if (bounds.length === 1) discoverMap.setView(bounds[0], 8);
+    else if (bounds.length > 1) discoverMap.fitBounds(bounds, { padding: [36, 36] });
+    else discoverMap.setView([46.8, 8.2], 4);
+  }
 
-  const bounds = [];
+  discoverLayerGroup.clearLayers();
+
   filtered.forEach((resort) => {
     const marker = window.L.marker([resort.lat, resort.lon], {
       icon: window.L.divIcon({
@@ -1292,17 +1303,8 @@ function mountDiscoverMap() {
       offset: [0, -12],
     });
 
-    marker.addTo(discoverMap);
-    bounds.push([resort.lat, resort.lon]);
+    marker.addTo(discoverLayerGroup);
   });
-
-  if (bounds.length === 1) {
-    discoverMap.setView(bounds[0], 8);
-  } else if (bounds.length > 1) {
-    discoverMap.fitBounds(bounds, { padding: [36, 36] });
-  } else {
-    discoverMap.setView([46.8, 8.2], 4);
-  }
 
   window.setTimeout(() => discoverMap && discoverMap.invalidateSize(), 0);
 }
@@ -1316,40 +1318,42 @@ function mountResortDetailMap() {
   const mapNode = document.getElementById("resort-detail-map");
   if (!mapNode || !window.L) return;
 
-  destroyResortDetailMap();
-
   const resort = selectedResort();
-  resortDetailMap = window.L.map(mapNode, {
-    zoomControl: false,
-    dragging: true,
-    scrollWheelZoom: false,
-  });
 
-  window.L.control.zoom({ position: "bottomright" }).addTo(resortDetailMap);
-  window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 18,
-  }).addTo(resortDetailMap);
+  if (!resortDetailMap) {
+    resortDetailMap = window.L.map(mapNode, {
+      zoomControl: false,
+      dragging: true,
+      scrollWheelZoom: false,
+    });
+    window.L.control.zoom({ position: "bottomright" }).addTo(resortDetailMap);
+    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap',
+      maxZoom: 18,
+    }).addTo(resortDetailMap);
+    
+    // We can directly add since it doesn't change dynamically within the same view instance without a hard redraw anyway
+    window.L.marker([resort.lat, resort.lon], {
+      icon: window.L.divIcon({
+        className: "resort-marker-wrap",
+        html: `<span class="resort-marker is-active"></span>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+      }),
+      title: resort.name,
+    }).addTo(resortDetailMap);
 
-  window.L.marker([resort.lat, resort.lon], {
-    icon: window.L.divIcon({
-      className: "resort-marker-wrap",
-      html: `<span class="resort-marker is-active"></span>`,
-      iconSize: [24, 24],
-      iconAnchor: [12, 12],
-    }),
-    title: resort.name,
-  }).addTo(resortDetailMap);
+    window.L.circle([resort.lat, resort.lon], {
+      radius: 4200,
+      color: "#2e66ff",
+      weight: 2,
+      fillColor: "#7ee3f2",
+      fillOpacity: 0.12,
+    }).addTo(resortDetailMap);
 
-  window.L.circle([resort.lat, resort.lon], {
-    radius: 4200,
-    color: "#2e66ff",
-    weight: 2,
-    fillColor: "#7ee3f2",
-    fillOpacity: 0.12,
-  }).addTo(resortDetailMap);
+    resortDetailMap.setView([resort.lat, resort.lon], 12);
+  }
 
-  resortDetailMap.setView([resort.lat, resort.lon], 12);
   window.setTimeout(() => resortDetailMap && resortDetailMap.invalidateSize(), 0);
 }
 
@@ -1367,10 +1371,20 @@ function quickEntry(title, copy, badgeClass, view) {
   `;
 }
 
+let savedDiscoverMapEl = null;
+let savedResortDetailMapEl = null;
+
 function render() {
   persist();
-  destroyDiscoverMap();
-  destroyResortDetailMap();
+
+  const curDiscMap = document.getElementById("discover-map");
+  if (curDiscMap) savedDiscoverMapEl = curDiscMap;
+  
+  const curResMap = document.getElementById("resort-detail-map");
+  if (curResMap) savedResortDetailMapEl = curResMap;
+
+  // We do NOT destroy the maps here so they persist!
+
   app.innerHTML = `
     <div class="topbar-wrap">
       <header class="topbar">
@@ -1400,6 +1414,13 @@ function render() {
     ${renderFooter()}
     ${renderMobileNav()}
   `;
+
+  const newDiscMap = document.getElementById("discover-map");
+  if (newDiscMap && savedDiscoverMapEl) newDiscMap.replaceWith(savedDiscoverMapEl);
+
+  const newResMap = document.getElementById("resort-detail-map");
+  if (newResMap && savedResortDetailMapEl) newResMap.replaceWith(savedResortDetailMapEl);
+
   hydrateVisibleData();
   mountDiscoverMap();
   mountResortDetailMap();

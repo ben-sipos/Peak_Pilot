@@ -728,11 +728,11 @@ function safeParse(value) {
 }
 
 function scheduleRender() {
-  if (scheduledRender) return;
+  if (scheduledRender) window.clearTimeout(scheduledRender);
   scheduledRender = window.setTimeout(() => {
     scheduledRender = null;
     render();
-  }, 80);
+  }, 600);
 }
 
 function selectedResort() {

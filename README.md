@@ -1,11 +1,11 @@
 # PeakPilot Alpine
 
-Hybrid ski travel prototype that combines:
+Hybrid ski travel prototype focused on:
 
-- SkiScout-style polished AI-first discovery
-- BERGFEX-style region depth and practical planning data
-- Live public API integrations where possible
-- Server-side placeholders for private travel APIs
+- polished resort discovery
+- practical trip planning data
+- live public API integrations where possible
+- server-side placeholders for private travel APIs
 
 ## Run locally
 

@@ -31,7 +31,6 @@ const resorts = [
     alerts: "Powder window Sunday to Tuesday",
     event: "Sunrise Glacier Breakfast",
     stay: "Ski-in suites, boutique lodges, premium chalets",
-    guideLink: "Luxury Meets Serious Terrain",
   },
   {
     id: "saint-anton",
@@ -65,7 +64,6 @@ const resorts = [
     alerts: "Wind easing by afternoon; fresh chalk on north-facing lines",
     event: "Arlberg Mountain Music Weekend",
     stay: "Boutique hotels, central apartments, design-led pensions",
-    guideLink: "Best Apres Ski in Europe",
   },
   {
     id: "val-gardena",
@@ -99,7 +97,6 @@ const resorts = [
     alerts: "Bluebird conditions most of next week",
     event: "Dolomite Sunset Sessions",
     stay: "Family hotels, spa resorts, half-board lodges",
-    guideLink: "Best Scenic Skiing Trips",
   },
   {
     id: "whistler",
@@ -133,7 +130,6 @@ const resorts = [
     alerts: "Heavy snow expected overnight with colder temps",
     event: "Peak to Village Winter Nights",
     stay: "Condos, village hotels, ski-in residences",
-    guideLink: "Best Big-Mountain Resort Bases",
   },
   {
     id: "niseko",
@@ -167,7 +163,6 @@ const resorts = [
     alerts: "Fresh snow totals tracking above forecast",
     event: "Lantern Powder Night",
     stay: "Modern condos, powder lodges, transit-linked stays",
-    guideLink: "Where to Book Powder Trips",
   },
   {
     id: "verbier",
@@ -201,7 +196,6 @@ const resorts = [
     alerts: "Variable alpine wind; lower mountain skiing best tomorrow morning",
     event: "Alpine House Sessions",
     stay: "Luxury chalets, design hotels, chef-led apartments",
-    guideLink: "Luxury Resorts with Real Terrain",
   },
   {
     id: "les-arcs",
@@ -235,7 +229,6 @@ const resorts = [
     alerts: "Stable grooming and good visibility through midweek",
     event: "Family Night Descents",
     stay: "Residences, family hotels, self-catered ski apartments",
-    guideLink: "Best Family Resorts for Big Domains",
   },
   {
     id: "banff",
@@ -269,58 +262,6 @@ const resorts = [
     alerts: "Cold clear weather; best snow remains on shaded aspects",
     event: "Rockies Winter Market",
     stay: "Town hotels, shuttle-linked lodges, spa escapes",
-    guideLink: "Scenic Resorts Worth the Long Flight",
-  },
-];
-
-const guides = [
-  {
-    id: "summer-skiing",
-    category: "Seasonal",
-    accent: "badge-lime",
-    title: "Best Summer Skiing Destinations",
-    excerpt: "Where glacier access, training lanes, and off-season alpine travel still work beautifully.",
-    body: [
-      "Summer skiing should be framed as a niche, high-intent product: training, novelty, and extending the season rather than mass-market leisure. The best version of the experience pairs dependable glacier access with a broader alpine stay that still feels worth the trip once the skis come off.",
-      "A modern travel site should surface this as a curated seasonal collection with timing windows, access notes, and realistic expectations. That keeps the inspiration of SkiScout while grounding it with the planning discipline BERGFEX users expect.",
-    ],
-    bullets: [
-      "Show realistic snow expectations rather than overselling conditions",
-      "Link each destination to access, lodging, and weather windows",
-      "Package resorts with off-slope summer experiences",
-    ],
-  },
-  {
-    id: "action-cameras",
-    category: "Equipment",
-    accent: "badge-blue",
-    title: "Best Action Cameras for Skiing 2026",
-    excerpt: "A practical breakdown by stabilization, battery, POV mounting, and cold-weather reliability.",
-    body: [
-      "Gear content builds trust when it is useful, not filler. SkiScout's guide strategy is excellent; the upgrade is to tie that editorial content directly into trips, resort pages, and weather context.",
-      "For example, if a user is saving a powder trip to Niseko, the site can recommend low-light camera options and glove-friendly controls. That is exactly the sort of product-content fusion that makes the whole platform feel coherent.",
-    ],
-    bullets: [
-      "Connect gear guides to resort conditions and trip type",
-      "Offer save-to-trip actions from within editorial",
-      "Rank by use case, not by generic specs alone",
-    ],
-  },
-  {
-    id: "avalanche-safety",
-    category: "Safety",
-    accent: "badge-warm",
-    title: "Avalanche Safety Equipment: Complete Guide",
-    excerpt: "The essential kit, training, and terrain judgment needed for backcountry travel.",
-    body: [
-      "Safety content should not be buried. One improvement over both references is to surface it at contextually correct moments, especially when someone is exploring freeride-heavy resorts.",
-      "This guide is stronger when paired with local guide services, weather warnings, and route-planning tools. That turns static advice into decision support.",
-    ],
-    bullets: [
-      "Pair safety guides with local terrain alerts",
-      "Surface backcountry warnings on relevant resort pages",
-      "Provide a learn-more path without overwhelming casual users",
-    ],
   },
 ];
 
@@ -394,7 +335,6 @@ function loadState() {
   return {
     view: saved?.view || "home",
     selectedResortId: saved?.selectedResortId || "zermatt",
-    selectedGuideId: saved?.selectedGuideId || "summer-skiing",
     filters: {
       search: saved?.filters?.search || "",
       country: saved?.filters?.country || "All",
@@ -424,7 +364,6 @@ function persist() {
     JSON.stringify({
       view: state.view,
       selectedResortId: state.selectedResortId,
-      selectedGuideId: state.selectedGuideId,
       filters: state.filters,
       savedResorts: [...state.savedResorts],
       compareResorts: [...state.compareResorts],
@@ -444,10 +383,6 @@ function safeParse(value) {
 
 function selectedResort() {
   return resorts.find((resort) => resort.id === state.selectedResortId) || resorts[0];
-}
-
-function selectedGuide() {
-  return guides.find((guide) => guide.id === state.selectedGuideId) || guides[0];
 }
 
 function filteredResorts() {
@@ -620,7 +555,6 @@ function render() {
           ${navButton("discover", "Discover")}
           ${navButton("snow", "Snow")}
           ${navButton("planner", "Trip Planner")}
-          ${navButton("guides", "Guides")}
           ${navButton("expert", "Expert AI")}
           ${navButton("dashboard", "My Trips")}
         </nav>
@@ -650,8 +584,6 @@ function renderView() {
       return renderSnow();
     case "planner":
       return renderPlanner();
-    case "guides":
-      return renderGuides();
     case "expert":
       return renderExpert();
     case "dashboard":
@@ -672,8 +604,8 @@ function renderHome() {
           <span class="eyebrow">PeakPilot x Alpine Intelligence</span>
           <h1>Find your perfect <span>ski base, snow window, and full trip plan</span></h1>
           <p>
-            This new platform combines SkiScout’s polished AI-first guidance with BERGFEX’s deep regional coverage:
-            live conditions, region maps, destination browsing, accommodations, events, and planning in one calm workflow.
+            Explore mountain destinations with live snow data, map-based discovery, accommodation planning,
+            events, and one connected trip workflow.
           </p>
           <div class="hero-actions">
             <button class="pill-btn" data-action="navigate" data-view="discover">Find my best resort</button>
@@ -684,11 +616,10 @@ function renderHome() {
             <span>500+ resorts</span>
             <span>Live snow, stays, events, and trip planning</span>
             <span>${integrationSummary()}</span>
-            <button class="linkish" data-action="navigate" data-view="guides">See today’s reads</button>
           </div>
         </div>
         <aside class="floating-panel">
-          <h3>What the upgraded experience fixes</h3>
+          <h3>Built for fast, confident trip decisions</h3>
           <div class="floating-panel-grid">
             <div class="signal-card">
               <strong>One clear action</strong>
@@ -704,7 +635,7 @@ function renderHome() {
             </div>
             <div class="signal-card">
               <strong>Trip-ready</strong>
-              <span>Every resort, guide, and alert flows into planning.</span>
+              <span>Every resort, stay, and alert flows into planning.</span>
             </div>
           </div>
         </aside>
@@ -724,7 +655,7 @@ function renderHome() {
       <div class="section-head">
         <div>
           <span class="eyebrow" style="background: rgba(46,102,255,0.12); color: var(--brand-strong);">Live Snapshot</span>
-          <h2>Practical depth without BERGFEX-style clutter</h2>
+          <h2>Practical depth without visual overload</h2>
           <p>The homepage still inspires, but it also starts helping immediately with snow, value, events, and bookable pathways.</p>
         </div>
         <button class="outline-btn" data-action="navigate" data-view="discover">Open full explorer</button>
@@ -754,27 +685,27 @@ function renderHome() {
     <section class="section">
       <div class="feature-split">
         <article class="feature-card">
-          <span class="mini-badge badge-blue">Today’s reads</span>
-          <h3 class="panel-title">Editorial that actually supports planning</h3>
+          <span class="mini-badge badge-blue">Top experiences</span>
+          <h3 class="panel-title">Plan faster with destination-ready modules</h3>
           <p>
-            Keep SkiScout’s strong guide strategy, but connect it directly to destination choice, gear, weather, and booking steps.
+            Save time by moving directly from resort shortlisting into real trip-building decisions.
           </p>
           <div class="guide-grid" style="margin-top: 18px;">
-            ${guides
+            ${offers
               .map(
-                (guide) => `
-                <button class="guide-card" data-action="select-guide" data-id="${guide.id}">
-                  <span class="mini-badge ${guide.accent}">${guide.category}</span>
-                  <h3>${guide.title}</h3>
-                  <p>${guide.excerpt}</p>
-                </button>`,
+                (offer, index) => `
+                <article class="guide-card">
+                  <span class="mini-badge ${index === 0 ? "badge-lime" : index === 1 ? "badge-blue" : "badge-warm"}">${offer.kicker}</span>
+                  <h3>${offer.title}</h3>
+                  <p>${offer.note}</p>
+                </article>`,
               )
               .join("")}
           </div>
         </article>
         <article class="feature-card">
           <span class="mini-badge badge-lime">Discover + plan</span>
-          <h3 class="panel-title">SkiScout’s polish with BERGFEX’s utility</h3>
+          <h3 class="panel-title">Map-first discovery with live planning context</h3>
           <div class="feature-visual">
             ${resorts
               .slice(0, 6)
@@ -840,7 +771,7 @@ function renderDiscover() {
       <div>
         <span class="eyebrow" style="background: rgba(46,102,255,0.12); color: var(--brand-strong);">Discover</span>
         <h2>Map-first resort discovery with clean hierarchy</h2>
-        <p>Keep BERGFEX’s destination depth, but reduce visual fatigue through filtering, modular cards, and one strong next action.</p>
+        <p>Browse destinations with structured filters, map context, and one clear next action on every result.</p>
       </div>
     </section>
     <div class="page-layout">
@@ -954,7 +885,7 @@ function renderDiscover() {
                   <div class="meta-pill"><strong>${resort.skill}</strong><span>Best skill fit</span></div>
                   <div class="meta-pill"><strong>${resort.vibe}</strong><span>Trip style</span></div>
                   <div class="meta-pill"><strong>${formatFreshSnow(resort)}</strong><span>New snow</span></div>
-                  <div class="meta-pill"><strong>${resort.pass}</strong><span>Pass guide</span></div>
+                  <div class="meta-pill"><strong>${resort.pass}</strong><span>Pass info</span></div>
                 </div>
                 <div class="chip-row">${resort.reasons.map((reason) => `<span class="chip">${reason}</span>`).join("")}</div>
                 <div class="detail-actions">
@@ -995,9 +926,9 @@ function renderResort() {
       <section class="stack">
         <article class="hero-panel">
           <span class="mini-badge badge-lime">Why it’s a top pick</span>
-          <h3 class="panel-title" style="font-size: 2rem; color: white;">A clearer resort page than either reference site</h3>
+          <h3 class="panel-title" style="font-size: 2rem; color: white;">A decision-ready resort page</h3>
           <p>
-            This page keeps the data depth BERGFEX users need, but packages it into focused modules. SkiScout’s clean pacing remains, and the next action is always visible.
+            The page keeps all the important trip details together in focused modules, with the next action always visible.
           </p>
           <div class="detail-grid" style="margin-top: 18px;">
             <div class="metric"><small>Fresh snow</small><strong>${formatFreshSnow(resort)}</strong></div>
@@ -1011,7 +942,7 @@ function renderResort() {
             <div class="metric"><small>Skill fit</small><strong>${resort.skill}</strong></div>
             <div class="metric"><small>Trip vibe</small><strong>${resort.vibe}</strong></div>
             <div class="metric"><small>Airport</small><strong>${resort.airport}</strong></div>
-            <div class="metric"><small>Pass guide</small><strong>${resort.pass}</strong></div>
+            <div class="metric"><small>Pass info</small><strong>${resort.pass}</strong></div>
             <div class="metric"><small>Trail count</small><strong>${resort.trailCount}</strong></div>
             <div class="metric"><small>Lifts</small><strong>${resort.lifts}</strong></div>
           </div>
@@ -1068,7 +999,7 @@ function renderSnow() {
       <div>
         <span class="eyebrow" style="background: rgba(46,102,255,0.12); color: var(--brand-strong);">Snow intelligence</span>
         <h2>Live snow, forecast context, and decision-ready comparisons</h2>
-        <p>SkiScout already points toward this category. The improvement is giving it BERGFEX-grade substance without falling into visual overload.</p>
+        <p>Compare live snow conditions, current depth, and short-term forecast shifts across your shortlist.</p>
       </div>
     </section>
     <div class="snow-layout">
@@ -1132,7 +1063,7 @@ function renderPlanner() {
       <div>
         <span class="eyebrow" style="background: rgba(204,242,108,0.24); color: #58710f;">Trip planner</span>
         <h2>One workflow from destination to booking readiness</h2>
-        <p>This is where the combined product becomes better than both references: discovery, accommodation, transport, passes, events, and alerts all live in one planner.</p>
+        <p>Discovery, accommodation, transport, passes, events, and alerts all live in one planning flow.</p>
       </div>
       <button class="pill-btn" data-action="navigate" data-view="expert">Have AI propose the itinerary</button>
     </section>
@@ -1172,64 +1103,14 @@ function renderPlanner() {
         <div class="summary-card">
           <span class="mini-badge badge-warm">Budget frame</span>
           <div class="trip-grid" style="margin-top: 14px;">
-            <div class="meta-pill"><strong>${resort.pass}</strong><span>Pass guide</span></div>
+            <div class="meta-pill"><strong>${resort.pass}</strong><span>Pass info</span></div>
             <div class="meta-pill"><strong>${resort.price}</strong><span>Stay band</span></div>
             <div class="meta-pill"><strong>${offers[0].price}</strong><span>Package benchmark</span></div>
           </div>
         </div>
         <div class="summary-card">
           <span class="mini-badge badge-blue">Useful improvement</span>
-          <p>Instead of BERGFEX-style scattered offer widgets, the planner consumes deals into one actionable budget view.</p>
-        </div>
-      </aside>
-    </div>
-  `;
-}
-
-function renderGuides() {
-  const guide = selectedGuide();
-  return `
-    <section class="section-head">
-      <div>
-        <span class="eyebrow" style="background: rgba(247,200,115,0.18); color: #855515;">Guides</span>
-        <h2>Editorial that feeds discovery and planning</h2>
-        <p>Keep the best part of SkiScout’s content strategy, but make every article connect back to resorts, alerts, and trip actions.</p>
-      </div>
-    </section>
-    <div class="guide-layout">
-      <section class="stack">
-        <div class="guide-grid">
-          ${guides
-            .map(
-              (item) => `
-              <button class="guide-card" data-action="select-guide" data-id="${item.id}">
-                <span class="mini-badge ${item.accent}">${item.category}</span>
-                <h3>${item.title}</h3>
-                <p>${item.excerpt}</p>
-              </button>`,
-            )
-            .join("")}
-        </div>
-        <article class="guide-article">
-          <span class="mini-badge ${guide.accent}">${guide.category}</span>
-          <h2>${guide.title}</h2>
-          ${guide.body.map((paragraph) => `<p>${paragraph}</p>`).join("")}
-          <ul>${guide.bullets.map((bullet) => `<li>${bullet}</li>`).join("")}</ul>
-          <div class="hero-actions" style="margin-top: 22px;">
-            <button class="pill-btn" data-action="navigate" data-view="discover">Browse matching resorts</button>
-            <button class="ghost-btn" data-action="navigate" data-view="planner">Add this logic to my trip</button>
-          </div>
-        </article>
-      </section>
-      <aside class="stack">
-        <div class="summary-card">
-          <span class="mini-badge badge-blue">Linked resort</span>
-          <h3>${selectedResort().name}</h3>
-          <p>${selectedResort().guideLink}</p>
-        </div>
-        <div class="summary-card">
-          <span class="mini-badge badge-lime">Why it matters</span>
-          <p>Strong content is not just for SEO. It reduces uncertainty, improves trust, and gives the platform authority before booking decisions.</p>
+          <p>Offers and package benchmarks feed directly into one actionable budget view.</p>
         </div>
       </aside>
     </div>
@@ -1426,13 +1307,13 @@ function renderFooter() {
               <span style="color: rgba(255,255,255,0.64);">Modern resort discovery with serious trip utility</span>
             </span>
           </div>
-          <p>Built as the improved synthesis of SkiScout’s clarity and BERGFEX’s utility-rich travel depth.</p>
+          <p>A mountain travel platform for destination discovery, live snow tracking, and connected trip planning.</p>
         </div>
         <div>
           <ul>
             <li>Discover resorts by map, country, skill, and trip vibe</li>
             <li>Track live snow and create useful alert flows</li>
-            <li>Connect resorts, stays, guides, and events into one plan</li>
+            <li>Connect resorts, stays, and events into one plan</li>
             <li>${integrationSummary()}</li>
           </ul>
         </div>
@@ -1530,11 +1411,6 @@ document.addEventListener("click", (event) => {
   if (action === "toggle-plan-step") {
     const id = target.dataset.id;
     state.plannerChecks[id] = !state.plannerChecks[id];
-  }
-
-  if (action === "select-guide") {
-    state.selectedGuideId = target.dataset.id;
-    state.view = "guides";
   }
 
   if (action === "set-expert-prompt") {

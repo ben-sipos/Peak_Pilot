@@ -921,14 +921,14 @@ function renderForecastStrip(resort, count = 3) {
   return `
     <div class="forecast-strip">
       ${weather.daily.slice(0, count).map(
-        (day) => `
+    (day) => `
         <div class="forecast-card">
           <small>${shortDayLabel(day.date)} · ${shortDateLabel(day.date)}</small>
           <strong>${weatherLabelFromCode(day.weatherCode)}</strong>
           <span>${formatTempValue(day.tempMaxC)} high · ${formatTempValue(day.tempMinC)} low</span>
           <span>${Math.round(day.snowfallCm ?? 0)} cm snow · ${Math.round(day.precipProbabilityMax ?? 0)}% precip</span>
         </div>`,
-      ).join("")}
+  ).join("")}
     </div>
   `;
 }
@@ -950,7 +950,7 @@ function renderForecastGrid(resort) {
   return `
     <div class="forecast-grid">
       ${weather.daily.map(
-        (day) => `
+    (day) => `
         <div class="forecast-card">
           <small>${shortDayLabel(day.date)}</small>
           <strong>${weatherLabelFromCode(day.weatherCode)}</strong>
@@ -958,7 +958,7 @@ function renderForecastGrid(resort) {
           <span>${Math.round(day.snowfallCm ?? 0)} cm snow</span>
           <span>${Math.round(day.precipProbabilityMax ?? 0)}% precip · ${formatWindValue(day.windSpeedMaxKmh)}</span>
         </div>`,
-      ).join("")}
+  ).join("")}
     </div>
   `;
 }
@@ -1039,21 +1039,21 @@ function renderWeatherTrendCharts(resort) {
           <path d="M ${padding} ${padding} V ${height - padding}" class="chart-axis"/>
           <polyline points="${tempLine}" class="chart-line chart-line-temp"/>
           ${hourlyTemps
-            .map((value, index) => {
-              const x = padding + (index * (width - padding * 2)) / Math.max(hourlyTemps.length - 1, 1);
-              const valid = hourlyTemps.filter((item) => item != null);
-              const min = Math.min(...valid);
-              const max = Math.max(...valid);
-              const span = max - min || 1;
-              const y = height - padding - (((value ?? min) - min) / span) * (height - padding * 2);
-              return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="chart-dot"/>`;
-            })
-            .join("")}
+      .map((value, index) => {
+        const x = padding + (index * (width - padding * 2)) / Math.max(hourlyTemps.length - 1, 1);
+        const valid = hourlyTemps.filter((item) => item != null);
+        const min = Math.min(...valid);
+        const max = Math.max(...valid);
+        const span = max - min || 1;
+        const y = height - padding - (((value ?? min) - min) / span) * (height - padding * 2);
+        return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" class="chart-dot"/>`;
+      })
+      .join("")}
         </svg>
         <div class="chart-label-row">
           ${hourly
-            .map((item) => `<span>${new Date(item.time).toLocaleTimeString("en-US", { hour: "numeric" })}</span>`)
-            .join("")}
+      .map((item) => `<span>${new Date(item.time).toLocaleTimeString("en-US", { hour: "numeric" })}</span>`)
+      .join("")}
         </div>
       </article>
       <article class="chart-card">
@@ -1062,14 +1062,14 @@ function renderWeatherTrendCharts(resort) {
         <svg viewBox="0 0 ${width} ${height}" class="chart-svg" aria-label="Snowfall and wind outlook">
           <path d="M ${padding} ${height - padding} H ${width - padding}" class="chart-axis"/>
           ${dailySnow
-            .map((value, index) => {
-              const x = padding + 18 + index * ((width - padding * 2) / Math.max(dailySnow.length, 1));
-              const barWidth = 34;
-              const barHeight = (value / maxSnow) * (height - padding * 2 - 24);
-              const y = height - padding - barHeight;
-              return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth}" height="${barHeight.toFixed(1)}" rx="10" class="chart-bar"/>`;
-            })
-            .join("")}
+      .map((value, index) => {
+        const x = padding + 18 + index * ((width - padding * 2) / Math.max(dailySnow.length, 1));
+        const barWidth = 34;
+        const barHeight = (value / maxSnow) * (height - padding * 2 - 24);
+        const y = height - padding - barHeight;
+        return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth}" height="${barHeight.toFixed(1)}" rx="10" class="chart-bar"/>`;
+      })
+      .join("")}
           <polyline points="${windLine}" class="chart-line chart-line-wind"/>
         </svg>
         <div class="chart-label-row">
@@ -1163,7 +1163,7 @@ function ensureResortApiData(resort) {
         apiState.skiGeoByResort[resort.id] = data;
         scheduleRender();
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => apiState.pending.delete(geoKey));
   }
 
@@ -1175,7 +1175,7 @@ function ensureResortApiData(resort) {
         apiState.locationByResort[resort.id] = data;
         scheduleRender();
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => apiState.pending.delete(locationKey));
   }
 
@@ -1187,7 +1187,7 @@ function ensureResortApiData(resort) {
         apiState.nearbyByResort[resort.id] = data;
         scheduleRender();
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => apiState.pending.delete(nearbyKey));
   }
 
@@ -1205,7 +1205,7 @@ function ensureResortApiData(resort) {
         apiState.eventsByResort[resort.id] = data.items || [];
         scheduleRender();
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => apiState.pending.delete(eventsKey));
   }
 }
@@ -1331,7 +1331,7 @@ function mountResortDetailMap() {
       attribution: '&copy; OpenStreetMap',
       maxZoom: 18,
     }).addTo(resortDetailMap);
-    
+
     // We can directly add since it doesn't change dynamically within the same view instance without a hard redraw anyway
     window.L.marker([resort.lat, resort.lon], {
       icon: window.L.divIcon({
@@ -1383,7 +1383,7 @@ function render() {
     // Detach firmly before innerHTML wipe to preserve Leaflet's internal resize contexts and canvas memory perfectly
     curDiscMap.parentNode.removeChild(curDiscMap);
   }
-  
+
   const curResMap = document.getElementById("resort-detail-map");
   if (curResMap) {
     savedResortDetailMapEl = curResMap;
@@ -1522,8 +1522,8 @@ function renderHome() {
       </div>
       <div class="card-grid">
         ${bestSnow
-          .map(
-            (resort) => `
+      .map(
+        (resort) => `
             <article class="guide-card">
               <span class="mini-badge badge-blue">Fresh snow</span>
               <h3>${resort.name}</h3>
@@ -1537,8 +1537,8 @@ function renderHome() {
                 <button class="outline-btn" data-action="select-resort" data-id="${resort.id}">View resort</button>
               </div>
             </article>`,
-          )
-          .join("")}
+      )
+      .join("")}
       </div>
     </section>
 
@@ -1552,15 +1552,15 @@ function renderHome() {
           </p>
           <div class="guide-grid" style="margin-top: 18px;">
             ${offers
-              .map(
-                (offer, index) => `
+      .map(
+        (offer, index) => `
                 <article class="guide-card">
                   <span class="mini-badge ${index === 0 ? "badge-lime" : index === 1 ? "badge-blue" : "badge-warm"}">${offer.kicker}</span>
                   <h3>${offer.title}</h3>
                   <p>${offer.note}</p>
                 </article>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </article>
         <article class="feature-card">
@@ -1568,9 +1568,9 @@ function renderHome() {
           <h3 class="panel-title">Map-first discovery with live planning context</h3>
           <div class="feature-visual">
             ${resorts
-              .slice(0, 6)
-              .map(
-                (resort) => `
+      .slice(0, 6)
+      .map(
+        (resort) => `
                 <button
                   class="pin ${state.selectedResortId === resort.id ? "is-active" : ""}"
                   style="left: calc(${resort.position.x}% - 8px); top: calc(${resort.position.y}% - 8px);"
@@ -1578,8 +1578,8 @@ function renderHome() {
                   data-id="${resort.id}"
                   aria-label="Select ${resort.name}"
                 ></button>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
           <div class="chip-row">
             <span class="chip">AI resort matching</span>
@@ -1648,39 +1648,39 @@ function renderDiscover() {
           <div class="filter-label">Country</div>
           <div class="chip-row">
             ${countries
-              .map(
-                (country) => `
+      .map(
+        (country) => `
                 <button class="chip ${state.filters.country === country ? "is-active" : ""}" data-action="set-filter" data-filter="country" data-value="${country}">
                   ${country}
                 </button>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </div>
         <div class="panel">
           <div class="filter-label">Skill</div>
           <div class="chip-row">
             ${skills
-              .map(
-                (skill) => `
+      .map(
+        (skill) => `
                 <button class="chip ${state.filters.skill === skill ? "is-active" : ""}" data-action="set-filter" data-filter="skill" data-value="${skill}">
                   ${skill}
                 </button>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </div>
         <div class="panel">
           <div class="filter-label">Trip vibe</div>
           <div class="chip-row">
             ${vibes
-              .map(
-                (vibe) => `
+      .map(
+        (vibe) => `
                 <button class="chip ${state.filters.vibe === vibe ? "is-active" : ""}" data-action="set-filter" data-filter="vibe" data-value="${vibe}">
                   ${vibe}
                 </button>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </div>
         <div class="panel">
@@ -1738,11 +1738,10 @@ function renderDiscover() {
               <span class="chip">${focus.price}</span>
               <span class="chip">${focus.pass}</span>
             </div>
-            ${
-              event
-                ? `<div class="panel-note" style="margin-top: 16px;"><strong>${event.title}</strong><span>${event.venue || event.city || focus.name}${event.date ? ` - ${event.date}` : ""}</span></div>`
-                : ""
-            }
+            ${event
+      ? `<div class="panel-note" style="margin-top: 16px;"><strong>${event.title}</strong><span>${event.venue || event.city || focus.name}${event.date ? ` - ${event.date}` : ""}</span></div>`
+      : ""
+    }
             <div class="hero-actions" style="margin-top: 16px;">
               <button class="pill-btn" data-action="select-resort" data-id="${focus.id}">Open resort page</button>
               <button class="ghost-btn" data-action="toggle-save" data-id="${focus.id}">
@@ -1753,8 +1752,8 @@ function renderDiscover() {
         </div>
         <div class="resort-list">
           ${filtered
-            .map(
-              (resort) => `
+      .map(
+        (resort) => `
               <article class="list-card">
                 <div class="filter-row" style="justify-content: space-between; align-items: start;">
                   <div>
@@ -1787,8 +1786,8 @@ function renderDiscover() {
                   </button>
                 </div>
               </article>`,
-            )
-            .join("")}
+      )
+      .join("")}
         </div>
       </section>
     </div>
@@ -1851,11 +1850,10 @@ function renderResort() {
         </article>
         <article class="panel">
           <span class="mini-badge badge-blue">Live weather and forecast</span>
-          ${
-            weatherStatus === "error"
-              ? `<div class="panel-note" style="margin-top: 14px;"><strong>Weather retrying</strong><span>The live weather feed missed once and is retrying automatically.</span></div>`
-              : ""
-          }
+          ${weatherStatus === "error"
+      ? `<div class="panel-note" style="margin-top: 14px;"><strong>Weather retrying</strong><span>The live weather feed missed once and is retrying automatically.</span></div>`
+      : ""
+    }
           <div class="detail-grid" style="margin-top: 14px;">
             <div class="metric"><small>Current sky</small><strong>${formatCurrentWeatherLabel(resort)}</strong></div>
             <div class="metric"><small>Current temp</small><strong>${currentTempLabel(resort)}</strong></div>
@@ -1876,14 +1874,14 @@ function renderResort() {
           <h3 class="panel-title">Resort content organized by decision, not by noise</h3>
           <div class="card-grid" style="margin-top: 16px;">
             ${resort.highlights
-              .map(
-                (item, index) => `
+      .map(
+        (item, index) => `
                 <div class="metric">
                   <small>Highlight ${index + 1}</small>
                   <strong style="font-size: 1rem; line-height: 1.5;">${item}</strong>
                 </div>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </article>
       </section>
@@ -1903,7 +1901,7 @@ function renderResort() {
         </div>
         <div class="summary-card">
           <span class="mini-badge badge-lime">Live map data</span>
-          <h3>${skiGeoFor(resort)?.counts?.pistes ?? "..." } pistes nearby</h3>
+          <h3>${skiGeoFor(resort)?.counts?.pistes ?? "..."} pistes nearby</h3>
           <p>${skiGeoFor(resort)?.counts?.lifts ?? "..."} mapped lifts and ${skiGeoFor(resort)?.counts?.stations ?? "..."} stations from OpenStreetMap.</p>
         </div>
         <div class="summary-card">
@@ -1935,23 +1933,23 @@ function renderSnow() {
       <section class="stack">
         <div class="snow-grid">
           ${sorted
-            .slice(0, 6)
-            .map(
-              (resort) => `
+      .slice(0, 6)
+      .map(
+        (resort) => `
               <article class="metric">
                 <small>${resort.name}</small>
                 <strong>${formatSnowDepth(resort)}</strong>
                 <span class="muted">${formatFreshSnow(resort)} new • ${resort.liftsOpen} lifts open</span>
               </article>`,
-            )
-            .join("")}
+      )
+      .join("")}
         </div>
         <article class="panel">
           <span class="mini-badge badge-blue">Compare today</span>
           <div class="snow-table" style="margin-top: 16px;">
             ${sorted
-              .map(
-                (resort) => `
+      .map(
+        (resort) => `
                 <div class="snow-row">
                   <div>
                     <strong>${resort.name}</strong>
@@ -1962,8 +1960,8 @@ function renderSnow() {
                   <div><strong>${resort.liftsOpen}</strong><small>Lifts open</small></div>
                   <div><strong>${currentTempLabel(resort)}</strong><small>Temp</small></div>
                 </div>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </article>
       </section>
@@ -2011,8 +2009,8 @@ function renderPlanner() {
       </aside>
       <section class="stack">
         ${plannerTemplate
-          .map(
-            (step) => `
+      .map(
+        (step) => `
             <article class="planner-step ${state.plannerChecks[step.id] ? "is-done" : ""}">
               <div class="filter-row" style="justify-content: space-between; align-items: start;">
                 <div>
@@ -2025,8 +2023,8 @@ function renderPlanner() {
                 </button>
               </div>
             </article>`,
-          )
-          .join("")}
+      )
+      .join("")}
       </section>
       <aside class="sticky-panel stack">
         <div class="summary-card">
@@ -2080,14 +2078,14 @@ function renderExpert() {
           </div>
           <div class="card-grid" style="margin-top: 18px;">
             ${answer.points
-              .map(
-                (point) => `
+      .map(
+        (point) => `
                 <div class="metric">
                   <small>${point.label}</small>
                   <strong style="font-size: 1rem; line-height: 1.5;">${point.value}</strong>
                 </div>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </article>
       </section>
@@ -2096,11 +2094,11 @@ function renderExpert() {
           <span class="mini-badge badge-lime">Suggested prompts</span>
           <div class="chat-suggestions" style="margin-top: 14px;">
             ${prompts
-              .map(
-                (prompt) => `
+      .map(
+        (prompt) => `
                 <button class="outline-btn" data-action="set-expert-prompt" data-prompt="${escapeAttr(prompt)}">${prompt}</button>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </div>
         <div class="summary-card">
@@ -2152,8 +2150,8 @@ function renderDashboard() {
           <span class="mini-badge badge-blue">Saved resorts</span>
           <div class="resort-list" style="margin-top: 16px;">
             ${saved
-              .map(
-                (resort) => `
+      .map(
+        (resort) => `
                 <div class="list-card">
                   <div class="filter-row" style="justify-content: space-between;">
                     <div>
@@ -2163,8 +2161,8 @@ function renderDashboard() {
                     <button class="outline-btn" data-action="select-resort" data-id="${resort.id}">Open</button>
                   </div>
                 </div>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </article>
       </section>
@@ -2189,15 +2187,15 @@ function renderDashboard() {
           <span class="mini-badge badge-warm">Events you may care about</span>
           <div class="event-list" style="margin-top: 14px;">
             ${events
-              .slice(0, 2)
-              .map(
-                (event) => `
+      .slice(0, 2)
+      .map(
+        (event) => `
                 <div class="event-card">
                   <h3>${event.title}</h3>
                   <p>${event.location} • ${event.date}</p>
                 </div>`,
-              )
-              .join("")}
+      )
+      .join("")}
           </div>
         </div>
       </aside>
@@ -2252,13 +2250,13 @@ function renderMobileNav() {
   return `
     <nav class="mobile-nav" aria-label="Mobile navigation">
       ${items
-        .map(
-          ([view, label]) => `
+      .map(
+        ([view, label]) => `
           <button class="${state.view === view ? "is-active" : ""}" data-action="navigate" data-view="${view}">
             <span>${label}</span>
           </button>`,
-        )
-        .join("")}
+      )
+      .join("")}
     </nav>
   `;
 }

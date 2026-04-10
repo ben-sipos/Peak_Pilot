@@ -1378,10 +1378,18 @@ function render() {
   persist();
 
   const curDiscMap = document.getElementById("discover-map");
-  if (curDiscMap) savedDiscoverMapEl = curDiscMap;
+  if (curDiscMap) {
+    savedDiscoverMapEl = curDiscMap;
+    // Detach firmly before innerHTML wipe to preserve Leaflet's internal resize contexts and canvas memory perfectly
+    curDiscMap.parentNode.removeChild(curDiscMap);
+  }
   
   const curResMap = document.getElementById("resort-detail-map");
-  if (curResMap) savedResortDetailMapEl = curResMap;
+  if (curResMap) {
+    savedResortDetailMapEl = curResMap;
+    // Detach firmly
+    curResMap.parentNode.removeChild(curResMap);
+  }
 
   // We do NOT destroy the maps here so they persist!
 
